@@ -48,7 +48,7 @@
             <span class="badge bg-green-lt">正常</span>
             {% endif %}
           </td>
-          <td>{{ user.created_at }}</td>
+          <td>{{ user.created_at | datetime }}</td>
           <td>
             <div class="btn-list flex-nowrap">
               <button

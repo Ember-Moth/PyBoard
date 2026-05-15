@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
 
 from app.admin_ui.deps import (
@@ -26,7 +26,6 @@ from app.core.deps import (
     get_failed_job_service,
     get_log_service,
     get_mail_service,
-    get_stat_service,
     get_system_service,
     get_theme_service,
 )
@@ -36,7 +35,6 @@ from app.models.user.dto import UserRead
 from app.services.admin_tools import FailedJobService, LogService
 from app.services.auth import AuthService
 from app.services.mail import MailService
-from app.services.stat import StatService
 from app.services.system import SystemService
 from app.services.theme import ThemeService
 
@@ -48,47 +46,7 @@ async def stats_page(request: Request, auth: AuthService = Depends(get_auth_serv
     admin = await current_admin(request, auth)
     if admin is None:
         return redirect_to_login(request)
-    return page("admin/pages/stats.html.j2", request, admin, "stats", "统计分析")
-
-
-@router.get("/fragments/stats/overview", response_class=HTMLResponse, include_in_schema=False)
-async def stats_overview(
-    request: Request,
-    auth: AuthService = Depends(get_auth_service),
-    stat_service: StatService = Depends(get_stat_service),
-):
-    admin = await current_admin(request, auth)
-    if admin is None:
-        return unauthorized_fragment()
-    return template(
-        "admin/fragments/stats_overview.html.j2",
-        request,
-        {
-            "admin": admin,
-            "overview": await stat_service.overview(),
-            "orders": await stat_service.order_series(30),
-            "server_rank": await stat_service.server_rank("today", 15),
-            "user_rank": await stat_service.user_rank("today", 30),
-        },
-    )
-
-
-@router.get("/fragments/stats/user-traffic", response_class=HTMLResponse, include_in_schema=False)
-async def stats_user_traffic(
-    request: Request,
-    user_id: int | None = None,
-    auth: AuthService = Depends(get_auth_service),
-    stat_service: StatService = Depends(get_stat_service),
-):
-    admin = await current_admin(request, auth)
-    if admin is None:
-        return unauthorized_fragment()
-    traffic = await stat_service.user_traffic_log(user_id, 30) if user_id else []
-    return template(
-        "admin/fragments/stats_user_traffic.html.j2",
-        request,
-        {"admin": admin, "user_id": user_id or "", "traffic": traffic},
-    )
+    return RedirectResponse("/admin/dashboard", status_code=303)
 
 
 @router.get("/system", response_class=HTMLResponse, include_in_schema=False)

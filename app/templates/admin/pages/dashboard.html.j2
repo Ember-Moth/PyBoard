@@ -1,5 +1,8 @@
 {% extends "admin/layouts/shell.html.j2" %}
 {% block content %}
+<div class="page-header d-print-none">
+  <h2 class="page-title">仪表盘</h2>
+</div>
 <div
   hx-get="/admin/fragments/dashboard/overview"
   hx-trigger="load"
@@ -7,4 +10,5 @@
   hx-swap="innerHTML">
   <div class="text-secondary">正在加载...</div>
 </div>
+<div class="mt-3" id="dashboard-user-traffic" hx-get="/admin/fragments/dashboard/user-traffic" hx-trigger="load" hx-target="#dashboard-user-traffic" hx-swap="innerHTML"></div>
 {% endblock %}

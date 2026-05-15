@@ -25,7 +25,7 @@
           <td><code>{{ log.trade_no }}</code></td>
           <td>{{ "%.2f"|format(log.order_amount / 100) }}</td>
           <td>{{ "%.2f"|format(log.get_amount / 100) }}</td>
-          <td>{{ log.created_at }}</td>
+          <td>{{ log.created_at | datetime }}</td>
         </tr>
         {% else %}
         <tr><td colspan="7" class="text-center text-secondary py-4">暂无佣金记录</td></tr>

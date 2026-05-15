@@ -23,7 +23,7 @@
           <td>{{ notice.title }}</td>
           <td>{{ notice.tags or '-' }}</td>
           <td>{% if notice.show %}<span class="badge bg-green-lt">展示</span>{% else %}<span class="badge bg-secondary-lt">隐藏</span>{% endif %}</td>
-          <td>{{ notice.created_at }}</td>
+          <td>{{ notice.created_at | datetime }}</td>
           <td>
             <div class="btn-list flex-nowrap">
               <button class="btn btn-sm" type="button" hx-get="/admin/fragments/notices/form?notice_id={{ notice.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>

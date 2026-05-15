@@ -1,7 +1,10 @@
 """User DTO —— 接口视图，不做持久化。"""
 
-from pydantic import BaseModel, field_validator
+from pydantic import AliasChoices, BaseModel, Field as PydanticField, field_validator
 from sqlmodel import SQLModel
+
+
+_TURNSTILE_TOKEN_ALIAS = AliasChoices("recaptcha_data", "turnstile_token", "cf-turnstile-response")
 
 
 # ---- 认证 ----
@@ -10,6 +13,8 @@ class LoginRequest(BaseModel):
 
     email: str
     password: str
+    recaptcha_data: str | None = PydanticField(default=None, validation_alias=_TURNSTILE_TOKEN_ALIAS)
+    model_config = {"populate_by_name": True}
 
     @field_validator("email")
     @classmethod
@@ -32,6 +37,8 @@ class ForgetPasswordRequest(SQLModel):
     email: str
     email_code: str
     password: str
+    recaptcha_data: str | None = PydanticField(default=None, validation_alias=_TURNSTILE_TOKEN_ALIAS)
+    model_config = {"populate_by_name": True}
 
     @field_validator("email")
     @classmethod
@@ -54,6 +61,8 @@ class EmailVerifyRequest(SQLModel):
 
     email: str
     isforget: int | None = None
+    recaptcha_data: str | None = PydanticField(default=None, validation_alias=_TURNSTILE_TOKEN_ALIAS)
+    model_config = {"populate_by_name": True}
 
     @field_validator("email")
     @classmethod
@@ -94,6 +103,8 @@ class UserCreate(SQLModel):
     password: str
     invite_code: str | None = None
     email_code: str | None = None
+    recaptcha_data: str | None = PydanticField(default=None, validation_alias=_TURNSTILE_TOKEN_ALIAS)
+    model_config = {"populate_by_name": True}
 
     @field_validator("email")
     @classmethod

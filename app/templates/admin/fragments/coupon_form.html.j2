@@ -38,12 +38,12 @@
               <input name="limit_use_with_user" type="number" min="0" class="form-control" value="{{ coupon.limit_use_with_user if coupon and coupon.limit_use_with_user is not none else '' }}">
             </div>
             <div class="col-md-4">
-              <label class="form-label">开始时间戳</label>
-              <input name="started_at" type="number" min="0" class="form-control" value="{{ coupon.started_at if coupon else '' }}" required>
+              <label class="form-label">开始时间</label>
+              <input name="started_at" type="datetime-local" class="form-control" value="{{ coupon.started_at | datetime_input if coupon else '' }}" required>
             </div>
             <div class="col-md-4">
-              <label class="form-label">结束时间戳</label>
-              <input name="ended_at" type="number" min="0" class="form-control" value="{{ coupon.ended_at if coupon else '' }}" required>
+              <label class="form-label">结束时间</label>
+              <input name="ended_at" type="datetime-local" class="form-control" value="{{ coupon.ended_at | datetime_input if coupon else '' }}" required>
             </div>
             <div class="col-md-6">
               <label class="form-label">适用套餐</label>

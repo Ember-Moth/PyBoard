@@ -14,7 +14,7 @@
           <td>{{ log.subject }}</td>
           <td><code>{{ log.template_name }}</code></td>
           <td>{% if log.error %}<span class="badge bg-red-lt">失败</span>{% else %}<span class="badge bg-green-lt">成功</span>{% endif %}</td>
-          <td>{{ log.created_at }}</td>
+          <td>{{ log.created_at | datetime }}</td>
           <td><button class="btn btn-sm" type="button" hx-get="/admin/fragments/mail/log-detail?log_id={{ log.id }}" hx-target="#modal-root" hx-swap="innerHTML">详情</button></td>
         </tr>
         {% else %}

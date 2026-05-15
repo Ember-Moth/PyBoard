@@ -12,3 +12,4 @@ wheels/
 db.sqlite3
 logs/
 v2board/
+CLAUDE.md

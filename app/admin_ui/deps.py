@@ -2,6 +2,7 @@
 
 import secrets
 import urllib.parse
+from datetime import datetime
 from typing import Any
 
 from fastapi import Request
@@ -16,6 +17,8 @@ from app.services.auth import AuthService
 TOKEN_COOKIE = "admin_token"
 CSRF_COOKIE = "admin_csrf"
 templates = Jinja2Templates(directory="app/templates")
+templates.env.filters["datetime"] = lambda value, default="-": format_datetime(value, default)
+templates.env.filters["datetime_input"] = lambda value: datetime_input_value(value)
 
 
 async def current_admin(request: Request, auth: AuthService) -> UserRead | None:
@@ -113,6 +116,25 @@ def int_or_none(value: str | None) -> int | None:
     return int(value) if value else None
 
 
+def datetime_or_none(value: str | None) -> int | None:
+    value = (value or "").strip()
+    if not value:
+        return None
+    if value.isdigit():
+        return int(value)
+    try:
+        return int(datetime.fromisoformat(value).timestamp())
+    except ValueError as exc:
+        raise ValueError("时间格式不正确") from exc
+
+
+def required_datetime(value: str | None) -> int:
+    parsed = datetime_or_none(value)
+    if parsed is None:
+        raise ValueError("必填时间不能为空")
+    return parsed
+
+
 def float_or_none(value: str | None) -> float | None:
     value = (value or "").strip()
     return float(value) if value else None
@@ -127,3 +149,36 @@ def required_int(value: str | None) -> int:
 
 def as_bool(value: str | None) -> bool:
     return str(value or "").lower() in {"1", "true", "on", "yes"}
+
+
+def format_datetime(value: Any, default: str = "-") -> str:
+    timestamp = _timestamp_or_none(value)
+    if timestamp is None:
+        return str(value) if value not in (None, "") else default
+    if timestamp <= 0:
+        return default
+    return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S")
+
+
+def datetime_input_value(value: Any) -> str:
+    timestamp = _timestamp_or_none(value)
+    if timestamp is None or timestamp <= 0:
+        return ""
+    return datetime.fromtimestamp(timestamp).strftime("%Y-%m-%dT%H:%M")
+
+
+def _timestamp_or_none(value: Any) -> int | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        return int(value.timestamp())
+    if isinstance(value, int):
+        return value
+    if isinstance(value, float):
+        return int(value)
+    text = str(value).strip()
+    if not text:
+        return None
+    if text.lstrip("-").isdigit():
+        return int(text)
+    return None

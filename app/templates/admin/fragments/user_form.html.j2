@@ -54,8 +54,9 @@
               <input name="commission_rate" type="number" class="form-control" value="{{ user.commission_rate or '' }}">
             </div>
             <div class="col-md-4">
-              <label class="form-label">到期时间戳</label>
-              <input name="expired_at" type="number" class="form-control" value="{{ user.expired_at }}">
+              <label class="form-label">到期时间</label>
+              <input name="expired_at_original" type="hidden" value="{{ user.expired_at }}">
+              <input name="expired_at" type="datetime-local" class="form-control" value="{{ user.expired_at | datetime_input }}">
             </div>
             <div class="col-12">
               <label class="form-label">备注</label>

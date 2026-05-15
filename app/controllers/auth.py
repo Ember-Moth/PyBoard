@@ -28,11 +28,12 @@ async def register(
 
 @router.post("/login", response_model=ApiResponse[TokenResponse])
 async def login(
+    request: Request,
     data: LoginRequest,
     service: AuthService = Depends(get_auth_service),
 ):
     """登录并返回 JWT。"""
-    token = await service.login(data)
+    token = await service.login(data, request.client.host if request.client else None)
     return success(data=token)
 
 
@@ -59,11 +60,12 @@ async def token2_login(
 
 @router.post("/forget", response_model=ApiResponse[bool])
 async def forget_password(
+    request: Request,
     data: ForgetPasswordRequest,
     service: AuthService = Depends(get_auth_service),
 ):
     """通过邮箱验证码重置密码。"""
-    return success(data=await service.forget_password(data))
+    return success(data=await service.forget_password(data, client_ip=request.client.host if request.client else None))
 
 
 @router.post("/email-verify", response_model=ApiResponse[bool])

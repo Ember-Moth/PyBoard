@@ -9,7 +9,7 @@
         <dl class="row">
           <dt class="col-3">连接</dt><dd class="col-9">{{ job.connection }}</dd>
           <dt class="col-3">队列</dt><dd class="col-9"><code>{{ job.queue }}</code></dd>
-          <dt class="col-3">失败时间</dt><dd class="col-9">{{ job.failed_at }}</dd>
+          <dt class="col-3">失败时间</dt><dd class="col-9">{{ job.failed_at | datetime }}</dd>
         </dl>
         <label class="form-label">任务载荷</label>
         <pre class="bg-light p-3">{{ job.payload }}</pre>

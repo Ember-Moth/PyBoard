@@ -24,7 +24,7 @@
           <td><code>{{ code.code }}</code></td>
           <td>{{ code.pv }}</td>
           <td>{% if code.status == 0 %}<span class="badge bg-green-lt">可用</span>{% else %}<span class="badge bg-secondary-lt">停用</span>{% endif %}</td>
-          <td>{{ code.created_at }}</td>
+          <td>{{ code.created_at | datetime }}</td>
           <td>
             <div class="btn-list flex-nowrap">
               <button class="btn btn-sm" type="button" hx-get="/admin/fragments/invite/code-form?invite_id={{ code.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>

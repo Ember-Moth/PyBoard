@@ -15,6 +15,7 @@ from app.models.user.entity import User
 from app.repositories.invite_code import InviteCodeRepository
 from app.repositories.user import UserRepository
 from app.services.setting import SettingService
+from app.services.turnstile import TurnstileService
 from app.utils.password import hash_password, verify_and_upgrade
 
 _EMAIL_VERIFY_CODE_PREFIX = "email_verify_code:"
@@ -31,11 +32,13 @@ class AuthService:
         setting_service: SettingService,
         invite_repo: InviteCodeRepository,
         cache: RuntimeCache,
+        turnstile_service: TurnstileService,
     ):
         self.repo = repo
         self.setting_service = setting_service
         self.invite_repo = invite_repo
         self.cache = cache
+        self.turnstile_service = turnstile_service
 
     async def register(self, data: UserCreate, client_ip: str | None = None) -> TokenResponse:
         """注册用户并签发访问令牌。"""
@@ -43,6 +46,7 @@ class AuthService:
             raise ForbiddenException("当前停止注册")
         await self._check_email_policy(data.email)
         await self._check_register_limit(client_ip)
+        await self.turnstile_service.verify_if_enabled(data.recaptcha_data, client_ip)
         if await self.setting_service.get_int("email_verify", 0):
             await self._verify_email_code(data.email, data.email_code)
         if await self.repo.email_exists(data.email):
@@ -61,8 +65,16 @@ class AuthService:
         await self.cache.delete(f"{_EMAIL_VERIFY_CODE_PREFIX}{data.email}")
         return self._build_auth_token(user)
 
-    async def login(self, data: LoginRequest) -> TokenResponse:
+    async def login(
+        self,
+        data: LoginRequest,
+        client_ip: str | None = None,
+        *,
+        verify_turnstile: bool = True,
+    ) -> TokenResponse:
         """验证邮箱密码并签发访问令牌。"""
+        if verify_turnstile:
+            await self.turnstile_service.verify_if_enabled(data.recaptcha_data, client_ip)
         user = await self.repo.get_by_email(data.email)
         if user is None:
             raise UnauthorizedException("邮箱或密码错误")
@@ -100,8 +112,14 @@ class AuthService:
         user = await self.repo.update(user)
         return self._build_auth_token(user)
 
-    async def forget_password(self, data: ForgetPasswordRequest, email_code: str | None = None) -> bool:
+    async def forget_password(
+        self,
+        data: ForgetPasswordRequest,
+        email_code: str | None = None,
+        client_ip: str | None = None,
+    ) -> bool:
         """通过邮箱验证码重置密码。"""
+        await self.turnstile_service.verify_if_enabled(data.recaptcha_data, client_ip)
         email_code = email_code if email_code is not None else await self.cache.get(f"{_EMAIL_VERIFY_CODE_PREFIX}{data.email}")
         if not email_code or str(email_code) != str(data.email_code):
             raise BadRequestException("邮箱验证码错误")
@@ -117,6 +135,7 @@ class AuthService:
         """创建邮箱验证码并写入运行期缓存。"""
         await self._check_email_verify_rate(client_ip)
         await self._check_email_policy(data.email)
+        await self.turnstile_service.verify_if_enabled(data.recaptcha_data, client_ip)
 
         exists = await self.repo.email_exists(data.email)
         if data.isforget == 0 and exists:

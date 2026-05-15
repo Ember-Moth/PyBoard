@@ -25,7 +25,7 @@
           <td><code>{{ coupon.code }}</code></td>
           <td>{% if coupon.type == 1 %}固定金额{% elif coupon.type == 2 %}百分比{% else %}{{ coupon.type }}{% endif %}</td>
           <td>{{ coupon.value }}</td>
-          <td>{{ coupon.started_at }} - {{ coupon.ended_at }}</td>
+          <td>{{ coupon.started_at | datetime }} - {{ coupon.ended_at | datetime }}</td>
           <td>{% if coupon.show %}<span class="badge bg-green-lt">启用</span>{% else %}<span class="badge bg-secondary-lt">停用</span>{% endif %}</td>
           <td>
             <div class="btn-list flex-nowrap">

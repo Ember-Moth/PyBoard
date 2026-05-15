@@ -44,7 +44,10 @@ async def login_submit(request: Request, auth: AuthService = Depends(get_auth_se
     if not csrf or csrf != form.get("csrf_token"):
         return login_error(request, "页面已过期，请刷新后重试", form.get("next") or "/admin/dashboard")
     try:
-        token = await auth.login(LoginRequest(email=str(form.get("email") or ""), password=str(form.get("password") or "")))
+        token = await auth.login(
+            LoginRequest(email=str(form.get("email") or ""), password=str(form.get("password") or "")),
+            verify_turnstile=False,
+        )
         raw_token = token.auth_token.removeprefix("Bearer ").strip()
         await auth.require_admin(raw_token)
     except AppException as exc:

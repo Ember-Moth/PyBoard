@@ -9,6 +9,7 @@ from app.admin_ui.deps import (
     as_bool,
     blank_none,
     current_admin,
+    datetime_or_none,
     filters_from_request,
     form_data,
     int_or_none,
@@ -150,7 +151,7 @@ async def generate_users_action(
                 email_suffix=str(form.get("email_suffix") or ""),
                 password=blank_none(form.get("password")),
                 plan_id=int_or_none(form.get("plan_id")),
-                expired_at=int_or_none(form.get("expired_at")),
+                expired_at=datetime_or_none(form.get("expired_at")),
                 generate_count=int_or_none(form.get("generate_count")),
             )
         )

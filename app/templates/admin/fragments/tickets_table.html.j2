@@ -47,7 +47,7 @@
           <td>{{ ticket.level }}</td>
           <td>{% if ticket.status == 0 %}<span class="badge bg-blue-lt">处理中</span>{% else %}<span class="badge bg-secondary-lt">已关闭</span>{% endif %}</td>
           <td>{% if ticket.reply_status == 0 %}<span class="badge bg-yellow-lt">待客服</span>{% else %}<span class="badge bg-green-lt">已回复</span>{% endif %}</td>
-          <td>{{ ticket.created_at }}</td>
+          <td>{{ ticket.created_at | datetime }}</td>
           <td>
             <div class="btn-list flex-nowrap">
               <button class="btn btn-sm" type="button" hx-get="/admin/fragments/tickets/detail?ticket_id={{ ticket.id }}" hx-target="#modal-root" hx-swap="innerHTML">详情</button>

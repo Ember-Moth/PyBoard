@@ -1,6 +1,6 @@
 <div class="card">
   <div class="card-header">
-    <form class="row g-2 w-100" hx-get="/admin/fragments/stats/user-traffic" hx-target="#stats-user-traffic" hx-swap="innerHTML">
+    <form class="row g-2 w-100" hx-get="{{ fragment_path or '/admin/fragments/dashboard/user-traffic' }}" hx-target="{{ fragment_target or '#dashboard-user-traffic' }}" hx-swap="innerHTML">
       <div class="col-md-3">
         <input name="user_id" type="number" class="form-control" placeholder="用户编号" value="{{ user_id }}">
       </div>
@@ -15,7 +15,7 @@
       <thead><tr><th>记录时间</th><th>节点</th><th>上行</th><th>下行</th><th>倍率</th></tr></thead>
       <tbody>
         {% for item in traffic %}
-        <tr><td>{{ item.record_at }}</td><td>{{ item.server_id }}</td><td>{{ item.u }}</td><td>{{ item.d }}</td><td>{{ item.server_rate }}</td></tr>
+        <tr><td>{{ item.record_at | datetime }}</td><td>{{ item.server_id }}</td><td>{{ item.u }}</td><td>{{ item.d }}</td><td>{{ item.server_rate }}</td></tr>
         {% else %}
         <tr><td colspan="5" class="text-center text-secondary py-4">暂无用户流量记录</td></tr>
         {% endfor %}

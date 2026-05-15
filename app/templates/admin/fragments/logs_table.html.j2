@@ -69,7 +69,7 @@
           <td>{{ log.status_code or "-" }}</td>
           <td>{% if log.duration_ms is not none %}{{ log.duration_ms }}ms{% else %}-{% endif %}</td>
           <td>{{ log.ip or "-" }}</td>
-          <td>{{ log.created_at }}</td>
+          <td>{{ log.created_at | datetime }}</td>
           <td>
             <div class="btn-list flex-nowrap">
               <button class="btn btn-sm" type="button" hx-get="/admin/fragments/logs/detail?log_id={{ log.id }}" hx-target="#modal-root" hx-swap="innerHTML">详情</button>

@@ -4,7 +4,7 @@
       <div class="card-header"><div class="card-title">运行环境</div></div>
       <div class="card-body">
         <dl class="row mb-0">
-          <dt class="col-4">时间戳</dt><dd class="col-8">{{ status.time }}</dd>
+          <dt class="col-4">当前时间</dt><dd class="col-8">{{ status.time | datetime }}</dd>
           <dt class="col-4">Python</dt><dd class="col-8">{{ status.python }}</dd>
           <dt class="col-4">平台</dt><dd class="col-8">{{ status.platform }}</dd>
           <dt class="col-4">磁盘</dt><dd class="col-8">{{ status.disk.used }} / {{ status.disk.total }}</dd>

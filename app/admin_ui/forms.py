@@ -4,7 +4,7 @@ from typing import Any
 
 import orjson
 
-from app.admin_ui.deps import as_bool, blank_none, float_or_none, int_or_none, required_int
+from app.admin_ui.deps import as_bool, blank_none, datetime_or_none, float_or_none, int_or_none, required_datetime, required_int
 from app.models.invite_code.dto import InviteCodeCreate, InviteCodeUpdate
 from app.models.coupon.dto import CouponCreate, CouponGenerate, CouponUpdate
 from app.models.giftcard.dto import GiftcardCreate, GiftcardGenerate, GiftcardUpdate
@@ -33,7 +33,7 @@ def user_update_from_form(form: dict[str, str]) -> UserUpdate:
         plan_id=int_or_none(form.get("plan_id")),
         discount=int_or_none(form.get("discount")),
         commission_rate=int_or_none(form.get("commission_rate")),
-        expired_at=int_or_none(form.get("expired_at")),
+        expired_at=_datetime_or_original(form.get("expired_at"), form.get("expired_at_original")),
         remarks=blank_none(form.get("remarks")),
         banned=as_bool(form.get("banned")),
         is_admin=as_bool(form.get("is_admin")),
@@ -118,8 +118,8 @@ def coupon_create_from_form(form: dict[str, str]) -> CouponCreate:
         limit_use_with_user=int_or_none(form.get("limit_use_with_user")),
         limit_plan_ids=blank_none(form.get("limit_plan_ids")),
         limit_period=blank_none(form.get("limit_period")),
-        started_at=required_int(form.get("started_at")),
-        ended_at=required_int(form.get("ended_at")),
+        started_at=required_datetime(form.get("started_at")),
+        ended_at=required_datetime(form.get("ended_at")),
     )
 
 
@@ -134,8 +134,8 @@ def coupon_update_from_form(form: dict[str, str]) -> CouponUpdate:
         limit_use_with_user=int_or_none(form.get("limit_use_with_user")),
         limit_plan_ids=blank_none(form.get("limit_plan_ids")),
         limit_period=blank_none(form.get("limit_period")),
-        started_at=int_or_none(form.get("started_at")),
-        ended_at=int_or_none(form.get("ended_at")),
+        started_at=datetime_or_none(form.get("started_at")),
+        ended_at=datetime_or_none(form.get("ended_at")),
     )
 
 
@@ -150,8 +150,8 @@ def coupon_generate_from_form(form: dict[str, str]) -> CouponGenerate:
         limit_use_with_user=int_or_none(form.get("limit_use_with_user")),
         limit_plan_ids=blank_none(form.get("limit_plan_ids")),
         limit_period=blank_none(form.get("limit_period")),
-        started_at=required_int(form.get("started_at")),
-        ended_at=required_int(form.get("ended_at")),
+        started_at=required_datetime(form.get("started_at")),
+        ended_at=required_datetime(form.get("ended_at")),
     )
 
 
@@ -163,8 +163,8 @@ def giftcard_create_from_form(form: dict[str, str]) -> GiftcardCreate:
         value=int_or_none(form.get("value")),
         plan_id=int_or_none(form.get("plan_id")),
         limit_use=int_or_none(form.get("limit_use")),
-        started_at=required_int(form.get("started_at")),
-        ended_at=required_int(form.get("ended_at")),
+        started_at=required_datetime(form.get("started_at")),
+        ended_at=required_datetime(form.get("ended_at")),
     )
 
 
@@ -177,8 +177,8 @@ def giftcard_update_from_form(form: dict[str, str]) -> GiftcardUpdate:
         plan_id=int_or_none(form.get("plan_id")),
         limit_use=int_or_none(form.get("limit_use")),
         used_user_ids=blank_none(form.get("used_user_ids")),
-        started_at=int_or_none(form.get("started_at")),
-        ended_at=int_or_none(form.get("ended_at")),
+        started_at=datetime_or_none(form.get("started_at")),
+        ended_at=datetime_or_none(form.get("ended_at")),
     )
 
 
@@ -189,8 +189,8 @@ def giftcard_generate_from_form(form: dict[str, str]) -> GiftcardGenerate:
         value=int_or_none(form.get("value")),
         plan_id=int_or_none(form.get("plan_id")),
         limit_use=int_or_none(form.get("limit_use")),
-        started_at=required_int(form.get("started_at")),
-        ended_at=required_int(form.get("ended_at")),
+        started_at=required_datetime(form.get("started_at")),
+        ended_at=required_datetime(form.get("ended_at")),
         generate_count=required_int(form.get("generate_count")),
     )
 
@@ -388,6 +388,12 @@ def mail_send_from_form(form: dict[str, str]) -> MailSend:
         template_name=str(form.get("template_name") or "").strip(),
         template_value=_json_object_from_text(form.get("template_value")) or {},
     )
+
+
+def _datetime_or_original(value: str | None, original: str | None) -> int | None:
+    if (value or "").strip():
+        return datetime_or_none(value)
+    return int_or_none(original)
 
 
 def _coerce_typed_value(value: str, type_hint: str) -> str | int | bool | dict | list:

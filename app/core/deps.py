@@ -54,6 +54,7 @@ from app.services.subscribe import SubscribeService
 from app.services.telegram import TelegramService
 from app.services.ticket import TicketService
 from app.services.theme import ThemeService
+from app.services.turnstile import TurnstileService
 from app.services.user import UserService
 
 # ---- DB ----
@@ -103,13 +104,20 @@ def get_user_service(
     return UserService(repo, plan_repo)
 
 
+def get_turnstile_service(
+    setting_service: SettingService = Depends(get_setting_service),
+) -> TurnstileService:
+    return TurnstileService(setting_service)
+
+
 def get_auth_service(
     repo: UserRepository = Depends(get_user_repository),
     setting_service: SettingService = Depends(get_setting_service),
     invite_repo: InviteCodeRepository = Depends(get_invite_code_repository),
     cache: RuntimeCache = CacheDep,
+    turnstile_service: TurnstileService = Depends(get_turnstile_service),
 ) -> AuthService:
-    return AuthService(repo, setting_service, invite_repo, cache)
+    return AuthService(repo, setting_service, invite_repo, cache, turnstile_service)
 
 
 def get_bearer_token(

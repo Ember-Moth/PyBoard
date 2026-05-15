@@ -13,8 +13,8 @@
             <div class="col-md-3"><label class="form-label">数量</label><input name="generate_count" type="number" min="1" max="500" value="1" class="form-control" required></div>
             <div class="col-md-3"><label class="form-label">类型</label><select name="type" class="form-select"><option value="1">固定金额</option><option value="2">百分比</option></select></div>
             <div class="col-md-4"><label class="form-label">面值</label><input name="value" type="number" min="1" class="form-control" required></div>
-            <div class="col-md-4"><label class="form-label">开始时间戳</label><input name="started_at" type="number" min="0" class="form-control" required></div>
-            <div class="col-md-4"><label class="form-label">结束时间戳</label><input name="ended_at" type="number" min="0" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">开始时间</label><input name="started_at" type="datetime-local" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">结束时间</label><input name="ended_at" type="datetime-local" class="form-control" required></div>
             <div class="col-md-6"><label class="form-label">总次数</label><input name="limit_use" type="number" min="0" class="form-control"></div>
             <div class="col-md-6"><label class="form-label">单用户次数</label><input name="limit_use_with_user" type="number" min="0" class="form-control"></div>
             <div class="col-md-6"><label class="form-label">适用套餐</label><input name="limit_plan_ids" class="form-control"></div>

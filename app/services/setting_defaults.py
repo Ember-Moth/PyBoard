@@ -46,7 +46,6 @@ DEFAULT_SETTING_GROUPS: dict[str, tuple[SettingDefault, ...]] = {
     ),
     "site": (
         SettingDefault("logo", "", "str", "站点 Logo"),
-        SettingDefault("force_https", 0, "int", "强制 HTTPS"),
         SettingDefault("stop_register", 0, "int", "暂停新用户注册"),
         SettingDefault("app_name", "PyBoard", "str", "应用名称"),
         SettingDefault("app_description", "PyBoard panel backend.", "str", "应用简介"),
@@ -112,7 +111,6 @@ DEFAULT_SETTING_GROUPS: dict[str, tuple[SettingDefault, ...]] = {
     "safe": (
         SettingDefault("email_verify", 0, "int", "启用邮箱验证码"),
         SettingDefault("safe_mode_enable", 0, "int", "启用安全模式"),
-        SettingDefault("secure_path", "", "str", "后台安全路径"),
         SettingDefault("email_whitelist_enable", 0, "int", "启用邮箱后缀白名单"),
         SettingDefault(
             "email_whitelist_suffix",
@@ -121,9 +119,9 @@ DEFAULT_SETTING_GROUPS: dict[str, tuple[SettingDefault, ...]] = {
             "允许注册的邮箱后缀",
         ),
         SettingDefault("email_gmail_limit_enable", 0, "int", "限制 Gmail 别名注册"),
-        SettingDefault("recaptcha_enable", 0, "int", "启用人机验证"),
-        SettingDefault("recaptcha_key", "", "str", "人机验证服务密钥"),
-        SettingDefault("recaptcha_site_key", "", "str", "人机验证站点密钥"),
+        SettingDefault("recaptcha_enable", 0, "int", "启用 Cloudflare Turnstile"),
+        SettingDefault("recaptcha_key", "", "str", "Turnstile Secret Key"),
+        SettingDefault("recaptcha_site_key", "", "str", "Turnstile Site Key"),
         SettingDefault("register_limit_by_ip_enable", 0, "int", "限制同 IP 注册"),
         SettingDefault("register_limit_count", 3, "int", "同 IP 注册次数"),
         SettingDefault("register_limit_expire", 60, "int", "注册限制周期（分钟）"),

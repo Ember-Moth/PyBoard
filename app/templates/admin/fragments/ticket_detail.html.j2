@@ -16,7 +16,7 @@
           <div class="list-group-item">
             <div class="d-flex">
               <strong>{% if message.is_me %}客服{% else %}用户 {{ message.user_id }}{% endif %}</strong>
-              <span class="text-secondary ms-auto">{{ message.created_at }}</span>
+              <span class="text-secondary ms-auto">{{ message.created_at | datetime }}</span>
             </div>
             <div class="mt-2" style="white-space: pre-wrap;">{{ message.message }}</div>
           </div>

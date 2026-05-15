@@ -11,7 +11,7 @@
           <dt class="col-3">主题</dt><dd class="col-9">{{ log.subject }}</dd>
           <dt class="col-3">模板</dt><dd class="col-9"><code>{{ log.template_name }}</code></dd>
           <dt class="col-3">错误</dt><dd class="col-9"><pre class="mb-0">{{ log.error or "" }}</pre></dd>
-          <dt class="col-3">创建时间</dt><dd class="col-9">{{ log.created_at }}</dd>
+          <dt class="col-3">创建时间</dt><dd class="col-9">{{ log.created_at | datetime }}</dd>
         </dl>
       </div>
     </div>

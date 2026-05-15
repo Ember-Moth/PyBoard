@@ -10,6 +10,14 @@
   <div class="col-sm-6 col-lg-3">
     <div class="card">
       <div class="card-body">
+        <div class="subheader">订单金额</div>
+        <div class="h1 mb-0">{{ "%.2f"|format((overview.order_total or 0) / 100) }}</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="card">
+      <div class="card-body">
         <div class="subheader">已支付订单</div>
         <div class="h1 mb-0">{{ overview.paid_count or 0 }}</div>
       </div>
@@ -19,7 +27,7 @@
     <div class="card">
       <div class="card-body">
         <div class="subheader">成交金额</div>
-        <div class="h1 mb-0">{{ overview.paid_total or 0 }}</div>
+        <div class="h1 mb-0">{{ "%.2f"|format((overview.paid_total or 0) / 100) }}</div>
       </div>
     </div>
   </div>
@@ -31,7 +39,38 @@
       </div>
     </div>
   </div>
-  <div class="col-12">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">统计快照</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+          <thead>
+            <tr>
+              <th>时间</th>
+              <th>订单</th>
+              <th>支付</th>
+              <th>支付金额</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in orders %}
+            <tr>
+              <td>{{ item.record_at | datetime }}</td>
+              <td>{{ item.order_count }}</td>
+              <td>{{ item.paid_count }}</td>
+              <td>{{ "%.2f"|format((item.paid_total or 0) / 100) }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="4" class="text-center text-secondary py-4">暂无快照</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">系统状态</h3>
@@ -42,6 +81,64 @@
             <tr><td>Python</td><td>{{ system.python }}</td></tr>
             <tr><td>平台</td><td>{{ system.platform }}</td></tr>
             <tr><td>磁盘使用</td><td>{{ system.disk.used }} / {{ system.disk.total }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">节点流量排行</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+          <thead>
+            <tr>
+              <th>节点</th>
+              <th>类型</th>
+              <th>总流量</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in server_rank %}
+            <tr>
+              <td>{{ item.server_id }}</td>
+              <td>{{ item.server_type }}</td>
+              <td>{{ item.total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-secondary py-4">暂无数据</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title">用户流量排行</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table table-vcenter card-table">
+          <thead>
+            <tr>
+              <th>用户</th>
+              <th>倍率</th>
+              <th>总流量</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in user_rank %}
+            <tr>
+              <td>{{ item.user_id }}</td>
+              <td>{{ item.server_rate }}</td>
+              <td>{{ item.total }}</td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="text-center text-secondary py-4">暂无数据</td></tr>
+            {% endfor %}
           </tbody>
         </table>
       </div>

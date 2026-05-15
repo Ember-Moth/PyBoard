@@ -36,7 +36,34 @@ async def dashboard_overview(
         {
             "admin": user,
             "overview": await stat_service.overview(),
+            "orders": await stat_service.order_series(30),
+            "server_rank": await stat_service.server_rank("today", 15),
+            "user_rank": await stat_service.user_rank("today", 30),
             "system": await system_service.status(),
             "queue": await system_service.queue_stats(),
+        },
+    )
+
+
+@router.get("/fragments/dashboard/user-traffic", response_class=HTMLResponse, include_in_schema=False)
+async def dashboard_user_traffic(
+    request: Request,
+    user_id: int | None = None,
+    auth: AuthService = Depends(get_auth_service),
+    stat_service: StatService = Depends(get_stat_service),
+):
+    user = await current_admin(request, auth)
+    if user is None:
+        return unauthorized_fragment()
+    traffic = await stat_service.user_traffic_log(user_id, 30) if user_id else []
+    return template(
+        "admin/fragments/stats_user_traffic.html.j2",
+        request,
+        {
+            "admin": user,
+            "user_id": user_id or "",
+            "traffic": traffic,
+            "fragment_path": "/admin/fragments/dashboard/user-traffic",
+            "fragment_target": "#dashboard-user-traffic",
         },
     )
