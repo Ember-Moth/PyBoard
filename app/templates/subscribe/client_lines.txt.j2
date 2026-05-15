@@ -1,0 +1,9 @@
+{% import "subscribe/_protocols.j2" as proto -%}
+{% if format == "shadowrocket" -%}
+STATUS=UP:{{ user.upload_gb }}GB,DOWN:{{ user.download_gb }}GB,TOTAL:{{ user.total_gb }}GB,EXPIRE:{{ user.expired_date }}
+{% endif -%}
+{% for server in servers -%}
+{% set line = proto.line(format, user, server) | trim -%}
+{% if line %}{{ line }}
+{% endif -%}
+{% endfor -%}

@@ -1,0 +1,16 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <h2 class="page-title">统计分析</h2>
+</div>
+<div class="row g-3">
+  <div class="col-12">
+    <div id="stats-overview" hx-get="/admin/fragments/stats/overview" hx-trigger="load" hx-target="#stats-overview" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载统计...</div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div id="stats-user-traffic" hx-get="/admin/fragments/stats/user-traffic" hx-trigger="load" hx-target="#stats-user-traffic" hx-swap="innerHTML"></div>
+  </div>
+</div>
+{% endblock %}

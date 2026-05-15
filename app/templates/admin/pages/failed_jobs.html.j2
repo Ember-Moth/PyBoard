@@ -1,0 +1,9 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <h2 class="page-title">失败任务</h2>
+</div>
+<div id="failed-jobs-table" hx-get="/admin/fragments/failed-jobs/table" hx-trigger="load" hx-target="#failed-jobs-table" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载失败任务...</div>
+</div>
+{% endblock %}

@@ -1,0 +1,65 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">优惠券列表</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>优惠券名称</th>
+          <th>券码</th>
+          <th>类型</th>
+          <th>面值</th>
+          <th>有效期</th>
+          <th>状态</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for coupon in coupons %}
+        <tr>
+          <td>{{ coupon.id }}</td>
+          <td>{{ coupon.name }}</td>
+          <td><code>{{ coupon.code }}</code></td>
+          <td>{% if coupon.type == 1 %}固定金额{% elif coupon.type == 2 %}百分比{% else %}{{ coupon.type }}{% endif %}</td>
+          <td>{{ coupon.value }}</td>
+          <td>{{ coupon.started_at }} - {{ coupon.ended_at }}</td>
+          <td>{% if coupon.show %}<span class="badge bg-green-lt">启用</span>{% else %}<span class="badge bg-secondary-lt">停用</span>{% endif %}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/coupons/form?coupon_id={{ coupon.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>
+              <form hx-post="/admin/actions/coupons/{{ coupon.id }}/toggle" hx-target="#coupons-table" hx-swap="innerHTML">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="offset" value="{{ offset }}">
+                <input type="hidden" name="limit" value="{{ limit }}">
+                <button class="btn btn-sm btn-outline-secondary" type="submit">{% if coupon.show %}停用{% else %}启用{% endif %}</button>
+              </form>
+              <form hx-post="/admin/actions/coupons/{{ coupon.id }}/delete" hx-target="#coupons-table" hx-swap="innerHTML" hx-confirm="确认删除该优惠券？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="offset" value="{{ offset }}">
+                <input type="hidden" name="limit" value="{{ limit }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-secondary py-4">暂无优惠券</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">共显示 {{ coupons | length }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if offset > 0 %}
+      <button class="btn" hx-get="/admin/fragments/coupons/table?offset={{ [offset - limit, 0] | max }}&limit={{ limit }}" hx-target="#coupons-table">上一页</button>
+      {% endif %}
+      {% if coupons | length == limit %}
+      <button class="btn" hx-get="/admin/fragments/coupons/table?offset={{ offset + limit }}&limit={{ limit }}" hx-target="#coupons-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

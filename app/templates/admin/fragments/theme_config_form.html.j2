@@ -1,0 +1,35 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/themes/{{ name }}/config" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">主题配置 {{ name }}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            {% for item in theme.configs %}
+            {% set field = item.field_name %}
+            <div class="col-md-6">
+              <label class="form-label">{{ item.label if item.label is defined else field }}</label>
+              {% if item.type is defined and item.type == "textarea" %}
+              <textarea name="{{ field }}" class="form-control" rows="4">{{ config.get(field, item.default if item.default is defined else '') }}</textarea>
+              {% else %}
+              <input name="{{ field }}" class="form-control" value="{{ config.get(field, item.default if item.default is defined else '') }}">
+              {% endif %}
+            </div>
+            {% else %}
+            <div class="col-12 text-secondary">该主题没有可配置项。</div>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

@@ -1,0 +1,16 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">知识库管理</h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <button class="btn btn-primary" type="button" hx-get="/admin/fragments/knowledge/form" hx-target="#modal-root" hx-swap="innerHTML">创建知识</button>
+    </div>
+  </div>
+</div>
+<div id="knowledge-table" hx-get="/admin/fragments/knowledge/table" hx-trigger="load" hx-target="#knowledge-table" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载...</div>
+</div>
+{% endblock %}

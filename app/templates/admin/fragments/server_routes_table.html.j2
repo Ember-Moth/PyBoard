@@ -1,0 +1,34 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">路由规则</div>
+    <div class="ms-auto">
+      <button class="btn btn-sm btn-primary" type="button" hx-get="/admin/fragments/servers/routes/form" hx-target="#modal-root" hx-swap="innerHTML">创建</button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table">
+      <thead><tr><th>编号</th><th>规则名称</th><th>处理方式</th><th>匹配内容</th><th class="w-1"></th></tr></thead>
+      <tbody>
+        {% for route in routes %}
+        <tr>
+          <td>{{ route.id }}</td>
+          <td>{{ route.remarks }}</td>
+          <td><code>{{ route.action }}</code> {{ route.action_value or "" }}</td>
+          <td class="text-truncate" style="max-width: 220px;">{{ route.match | join(", ") if route.match is sequence and route.match is not string else route.match }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/servers/routes/form?route_id={{ route.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>
+              <form hx-post="/admin/actions/servers/routes/{{ route.id }}/delete" hx-target="#server-routes-table" hx-swap="innerHTML" hx-confirm="确认删除该路由？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="text-center text-secondary py-4">暂无路由规则</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

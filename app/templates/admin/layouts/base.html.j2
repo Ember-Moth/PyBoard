@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <title>{{ title }} - Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css">
+  <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body>
+  {% block body %}{% endblock %}
+  <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
+  <script>
+    document.body.addEventListener("htmx:configRequest", function (event) {
+      const token = document.querySelector('meta[name="csrf-token"]')?.content;
+      if (token) event.detail.headers["X-CSRF-Token"] = token;
+    });
+    document.body.addEventListener("admin:close-modal", function () {
+      const root = document.getElementById("modal-root");
+      if (root) root.innerHTML = "";
+    });
+  </script>
+</body>
+</html>

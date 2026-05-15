@@ -1,0 +1,9 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <h2 class="page-title">主题管理</h2>
+</div>
+<div id="themes-table" hx-get="/admin/fragments/themes/table" hx-trigger="load" hx-target="#themes-table" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载主题...</div>
+</div>
+{% endblock %}

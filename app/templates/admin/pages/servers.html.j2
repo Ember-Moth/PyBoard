@@ -1,0 +1,32 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">节点管理</h2>
+    </div>
+    <div class="col-auto ms-auto btn-list">
+      <button class="btn btn-outline-primary" type="button" hx-get="/admin/fragments/servers/groups/form" hx-target="#modal-root" hx-swap="innerHTML">创建分组</button>
+      <button class="btn btn-outline-primary" type="button" hx-get="/admin/fragments/servers/routes/form" hx-target="#modal-root" hx-swap="innerHTML">创建路由</button>
+      <button class="btn btn-primary" type="button" hx-get="/admin/fragments/servers/nodes/form" hx-target="#modal-root" hx-swap="innerHTML">创建节点</button>
+    </div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-12">
+    <div id="server-nodes-table" hx-get="/admin/fragments/servers/nodes/table" hx-trigger="load" hx-target="#server-nodes-table" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载节点...</div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div id="server-groups-table" hx-get="/admin/fragments/servers/groups/table" hx-trigger="load" hx-target="#server-groups-table" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载分组...</div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div id="server-routes-table" hx-get="/admin/fragments/servers/routes/table" hx-trigger="load" hx-target="#server-routes-table" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载路由...</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

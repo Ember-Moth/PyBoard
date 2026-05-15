@@ -1,0 +1,34 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/users" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <input type="hidden" name="q" value="{{ filters.q }}">
+        <input type="hidden" name="status" value="{{ filters.status }}">
+        <input type="hidden" name="offset" value="{{ filters.offset }}">
+        <input type="hidden" name="limit" value="{{ filters.limit }}">
+        <div class="modal-header">
+          <h5 class="modal-title">创建用户</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">邮箱</label>
+              <input name="email" type="email" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">密码</label>
+              <input name="password" type="password" class="form-control" minlength="8" required>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">创建</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

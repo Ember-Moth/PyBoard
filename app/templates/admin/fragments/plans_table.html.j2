@@ -1,0 +1,69 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">套餐列表</div>
+    <div class="ms-auto text-secondary">{{ plans | length }} 个套餐</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>套餐名称</th>
+          <th>节点分组</th>
+          <th>流量</th>
+          <th>月付</th>
+          <th>订阅用户</th>
+          <th>状态</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for plan in plans %}
+        <tr>
+          <td>{{ plan.id }}</td>
+          <td>
+            <div class="fw-medium">{{ plan.name }}</div>
+            {% if plan.speed_limit %}<div class="text-secondary small">限速 {{ plan.speed_limit }} Mbps</div>{% endif %}
+          </td>
+          <td>{{ plan.group_id }}</td>
+          <td>{{ plan.transfer_enable }}</td>
+          <td>
+            {% if plan.month_price is not none %}
+            {{ "%.2f" % (plan.month_price / 100) }}
+            {% else %}
+            -
+            {% endif %}
+          </td>
+          <td>{{ plan.count }}</td>
+          <td>
+            {% if plan.show %}<span class="badge bg-green-lt">展示</span>{% else %}<span class="badge bg-secondary-lt">隐藏</span>{% endif %}
+            {% if plan.renew %}<span class="badge bg-blue-lt">可续费</span>{% else %}<span class="badge bg-orange-lt">不可续费</span>{% endif %}
+          </td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button
+                class="btn btn-sm"
+                type="button"
+                hx-get="/admin/fragments/plans/form?plan_id={{ plan.id }}"
+                hx-target="#modal-root"
+                hx-swap="innerHTML">
+                编辑
+              </button>
+              <form
+                hx-post="/admin/actions/plans/{{ plan.id }}/delete"
+                hx-target="#plans-table"
+                hx-swap="innerHTML"
+                hx-confirm="确认删除该套餐？有订单或活跃用户时会被拒绝。">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-secondary py-4">暂无套餐</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

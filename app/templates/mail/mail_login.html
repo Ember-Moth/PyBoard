@@ -1,0 +1,24 @@
+{% extends "mail/base.html" %}
+
+{% block body %}
+<div style="text-align: center; margin-bottom: 35px;">
+    <div style="width: 64px; height: 64px; background-color: #f0f3f7; border-radius: 50%; display: inline-block; line-height: 64px; font-size: 32px; color: #2c3345;">&#10003;</div>
+    <h2 style="margin: 20px 0 0; font-size: 20px; color: #2c3345; font-weight: 600;">登录验证</h2>
+</div>
+
+<p style="margin: 0 0 30px; font-size: 15px; color: #4f566b; line-height: 1.7; text-align: center;">
+    我们收到了新的登录请求，请点击下方按钮完成验证。
+</p>
+
+<div style="margin: 35px 0; text-align: center;">
+    <a href="{{ link }}" style="display: inline-block; padding: 14px 32px; background: linear-gradient(145deg, #2c3345 0%, #232838 100%); color: #ffffff; text-decoration: none; border-radius: 8px; font-size: 15px; font-weight: 500; transition: all 0.2s; box-shadow: 0 4px 12px rgba(44, 51, 69, 0.1);">确认登录</a>
+</div>
+
+<div style="margin: 40px 0 0; padding-top: 24px; border-top: 1px dashed #e9ecef;">
+    <p style="margin: 0; font-size: 13px; color: #8792a2; line-height: 1.6; text-align: center;">
+        此链接将在 5 分钟后失效。如非本人操作，请忽略此邮件。
+    </p>
+</div>
+{% endblock %}
+
+{% block footer %}安全邮件提醒{% endblock %}

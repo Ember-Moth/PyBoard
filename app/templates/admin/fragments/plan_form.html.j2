@@ -1,0 +1,68 @@
+{% set is_create = plan is none %}
+{% macro number_input(name, label, value='', required=false, min_value=none) -%}
+<div class="col-md-4">
+  <label class="form-label">{{ label }}</label>
+  <input
+    name="{{ name }}"
+    type="number"
+    class="form-control"
+    value="{{ value if value is not none else '' }}"
+    {% if required %}required{% endif %}
+    {% if min_value is not none %}min="{{ min_value }}"{% endif %}>
+</div>
+{%- endmacro %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/plans{% else %}/admin/actions/plans/{{ plan.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建套餐{% else %}编辑套餐 #{{ plan.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">套餐名称</label>
+              <input name="name" class="form-control" value="{{ plan.name if plan else '' }}" required>
+            </div>
+            {{ number_input("group_id", "适用节点分组", plan.group_id if plan else '', true, 1) }}
+            {{ number_input("transfer_enable", "套餐流量（字节）", plan.transfer_enable if plan else '', true, 0) }}
+            {{ number_input("device_limit", "同时在线设备数", plan.device_limit if plan else '', false, 0) }}
+            {{ number_input("speed_limit", "限速 Mbps", plan.speed_limit if plan else '', false, 0) }}
+            {{ number_input("sort", "排序", plan.sort if plan else '', false, 0) }}
+            {{ number_input("capacity_limit", "可售容量限制", plan.capacity_limit if plan else '', false, 0) }}
+            {{ number_input("month_price", "月付价格（分）", plan.month_price if plan else '', false, 0) }}
+            {{ number_input("quarter_price", "季付价格（分）", plan.quarter_price if plan else '', false, 0) }}
+            {{ number_input("half_year_price", "半年付价格（分）", plan.half_year_price if plan else '', false, 0) }}
+            {{ number_input("year_price", "年付价格（分）", plan.year_price if plan else '', false, 0) }}
+            {{ number_input("two_year_price", "两年付价格（分）", plan.two_year_price if plan else '', false, 0) }}
+            {{ number_input("three_year_price", "三年付价格（分）", plan.three_year_price if plan else '', false, 0) }}
+            {{ number_input("onetime_price", "一次性价格（分）", plan.onetime_price if plan else '', false, 0) }}
+            {{ number_input("reset_price", "重置流量价格（分）", plan.reset_price if plan else '', false, 0) }}
+            {{ number_input("reset_traffic_method", "流量重置策略", plan.reset_traffic_method if plan else '', false, 0) }}
+            <div class="col-12">
+              <label class="form-label">套餐说明</label>
+              <textarea name="content" class="form-control" rows="3">{{ plan.content if plan and plan.content else '' }}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="show" value="1" {% if plan and plan.show %}checked{% endif %}>
+                <span class="form-check-label">前台展示</span>
+              </label>
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="renew" value="1" {% if is_create or plan.renew %}checked{% endif %}>
+                <span class="form-check-label">允许续费</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

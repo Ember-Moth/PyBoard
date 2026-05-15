@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "bytes_used": {{ user.u + user.d }},
+  "bytes_remaining": {{ [user.transfer_enable - user.u - user.d, 0] | max }},
+  "servers": [
+{% set ns = namespace(first=true) -%}
+{% for server in servers if server.sip008 -%}
+{% if not ns.first %},{% endif %}
+    {
+      "id": {{ server.id }},
+      "remarks": {{ server.name | to_json }},
+      "server": {{ server.host | to_json }},
+      "server_port": {{ server.first_port_int }},
+      "password": {{ user.uuid | to_json }},
+      "method": {{ server.cipher | to_json }}
+    }
+{% set ns.first = false -%}
+{% endfor %}
+  ]
+}

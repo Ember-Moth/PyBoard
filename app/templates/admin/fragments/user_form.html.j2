@@ -1,0 +1,88 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/users/{{ user.id }}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <input type="hidden" name="q" value="{{ filters.q }}">
+        <input type="hidden" name="status" value="{{ filters.status }}">
+        <input type="hidden" name="offset" value="{{ filters.offset }}">
+        <input type="hidden" name="limit" value="{{ filters.limit }}">
+        <div class="modal-header">
+          <h5 class="modal-title">编辑用户 #{{ user.id }}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">邮箱</label>
+              <input name="email" class="form-control" value="{{ user.email }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">新密码</label>
+              <input name="password" type="password" class="form-control" placeholder="留空不修改">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">余额</label>
+              <input name="balance" type="number" class="form-control" value="{{ user.balance }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">所属套餐</label>
+              <input name="plan_id" type="number" class="form-control" value="{{ user.plan_id or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">用户分组</label>
+              <input name="group_id" type="number" class="form-control" value="{{ user.group_id or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">可用总流量（字节）</label>
+              <input name="transfer_enable" type="number" class="form-control" value="{{ user.transfer_enable }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">设备数</label>
+              <input name="device_limit" type="number" class="form-control" value="{{ user.device_limit or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">限速</label>
+              <input name="speed_limit" type="number" class="form-control" value="{{ user.speed_limit or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">折扣</label>
+              <input name="discount" type="number" class="form-control" value="{{ user.discount or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">返佣比例</label>
+              <input name="commission_rate" type="number" class="form-control" value="{{ user.commission_rate or '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">到期时间戳</label>
+              <input name="expired_at" type="number" class="form-control" value="{{ user.expired_at }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">备注</label>
+              <input name="remarks" class="form-control" value="{{ user.remarks or '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="banned" value="1" {% if user.banned %}checked{% endif %}>
+                <span class="form-check-label">封禁</span>
+              </label>
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="is_admin" value="1" {% if user.is_admin %}checked{% endif %}>
+                <span class="form-check-label">管理员</span>
+              </label>
+              <label class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="is_staff" value="1" {% if user.is_staff %}checked{% endif %}>
+                <span class="form-check-label">员工</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">保存</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

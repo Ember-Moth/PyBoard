@@ -1,0 +1,61 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">礼品卡列表</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>礼品卡名称</th>
+          <th>卡号</th>
+          <th>类型</th>
+          <th>面值</th>
+          <th>绑定套餐</th>
+          <th>次数</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for giftcard in giftcards %}
+        <tr>
+          <td>{{ giftcard.id }}</td>
+          <td>{{ giftcard.name }}</td>
+          <td><code>{{ giftcard.code }}</code></td>
+          <td>
+            {% if giftcard.type == 1 %}余额{% elif giftcard.type == 2 %}时长{% elif giftcard.type == 3 %}流量{% elif giftcard.type == 4 %}重置{% elif giftcard.type == 5 %}套餐{% else %}{{ giftcard.type }}{% endif %}
+          </td>
+          <td>{{ giftcard.value if giftcard.value is not none else '-' }}</td>
+          <td>{{ giftcard.plan_id or '-' }}</td>
+          <td>{{ giftcard.limit_use if giftcard.limit_use is not none else '-' }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/giftcards/form?giftcard_id={{ giftcard.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>
+              <form hx-post="/admin/actions/giftcards/{{ giftcard.id }}/delete" hx-target="#giftcards-table" hx-swap="innerHTML" hx-confirm="确认删除该礼品卡？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="offset" value="{{ offset }}">
+                <input type="hidden" name="limit" value="{{ limit }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-secondary py-4">暂无礼品卡</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">共显示 {{ giftcards | length }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if offset > 0 %}
+      <button class="btn" hx-get="/admin/fragments/giftcards/table?offset={{ [offset - limit, 0] | max }}&limit={{ limit }}" hx-target="#giftcards-table">上一页</button>
+      {% endif %}
+      {% if giftcards | length == limit %}
+      <button class="btn" hx-get="/admin/fragments/giftcards/table?offset={{ offset + limit }}&limit={{ limit }}" hx-target="#giftcards-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

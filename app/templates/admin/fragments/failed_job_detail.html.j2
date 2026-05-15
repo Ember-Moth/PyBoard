@@ -1,0 +1,22 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">失败任务 #{{ job.id }}</h5>
+        <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+      </div>
+      <div class="modal-body">
+        <dl class="row">
+          <dt class="col-3">连接</dt><dd class="col-9">{{ job.connection }}</dd>
+          <dt class="col-3">队列</dt><dd class="col-9"><code>{{ job.queue }}</code></dd>
+          <dt class="col-3">失败时间</dt><dd class="col-9">{{ job.failed_at }}</dd>
+        </dl>
+        <label class="form-label">任务载荷</label>
+        <pre class="bg-light p-3">{{ job.payload }}</pre>
+        <label class="form-label">异常信息</label>
+        <pre class="bg-light p-3">{{ job.exception }}</pre>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

@@ -1,0 +1,6 @@
+{% import "subscribe/_protocols.j2" as proto -%}
+{% for server in servers -%}
+{% set uri = proto.uri(user, server) | trim -%}
+{% if uri %}{{ uri }}
+{% endif -%}
+{% endfor -%}

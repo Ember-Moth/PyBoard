@@ -1,0 +1,50 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/users/generate" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <input type="hidden" name="q" value="{{ filters.q }}">
+        <input type="hidden" name="status" value="{{ filters.status }}">
+        <input type="hidden" name="offset" value="{{ filters.offset }}">
+        <input type="hidden" name="limit" value="{{ filters.limit }}">
+        <div class="modal-header">
+          <h5 class="modal-title">批量生成用户</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">邮箱前缀</label>
+              <input name="email_prefix" class="form-control" placeholder="留空自动生成">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">邮箱后缀</label>
+              <input name="email_suffix" class="form-control" placeholder="example.com" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">统一密码</label>
+              <input name="password" type="password" class="form-control" placeholder="留空使用邮箱">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">生成数量</label>
+              <input name="generate_count" type="number" class="form-control" value="1" min="1" max="500">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">套餐 ID</label>
+              <input name="plan_id" type="number" class="form-control" min="1">
+            </div>
+            <div class="col-12">
+              <label class="form-label">到期时间戳</label>
+              <input name="expired_at" type="number" class="form-control" value="0" min="0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">生成</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

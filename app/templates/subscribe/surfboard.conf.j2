@@ -1,0 +1,16 @@
+{% import "subscribe/_protocols.j2" as proto -%}
+[General]
+loglevel = notify
+
+[Proxy]
+{% for server in servers -%}
+{% set line = proto.line("surfboard", user, server) | trim -%}
+{% if line %}{{ line }}
+{% endif -%}
+{% endfor %}
+
+[Proxy Group]
+PROXY = select{% for server in servers %}{% set line = proto.line("surfboard", user, server) | trim %}{% if line %}, {{ server.name }}{% endif %}{% endfor %}, DIRECT
+
+[Rule]
+FINAL,PROXY

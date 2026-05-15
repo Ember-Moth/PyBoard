@@ -1,0 +1,28 @@
+{% import "subscribe/_protocols.j2" as proto -%}
+mixed-port: 7890
+allow-lan: true
+mode: rule
+log-level: warning
+
+proxies:
+{% for server in servers %}
+{% set proxy = proto.clash_proxy(user, server) | trim %}
+{% if proxy %}
+  - {{ proxy }}
+{% endif %}
+{% endfor %}
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+{% for server in servers %}
+{% set proxy = proto.clash_proxy(user, server) | trim %}
+{% if proxy %}
+      - {{ server.name | to_json }}
+{% endif %}
+{% endfor %}
+      - DIRECT
+
+rules:
+  - MATCH,PROXY

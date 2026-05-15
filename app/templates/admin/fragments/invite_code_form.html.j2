@@ -1,0 +1,44 @@
+{% set is_create = code is none %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-md modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/invite/codes{% else %}/admin/actions/invite/codes/{{ code.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建邀请码{% else %}编辑邀请码 #{{ code.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">归属用户</label>
+              <input name="user_id" type="number" class="form-control" value="{{ code.user_id if code else '' }}" {% if not is_create %}readonly{% endif %} required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">邀请码</label>
+              <input name="code" class="form-control" value="{{ code.code if code else '' }}" {% if not is_create %}readonly{% endif %} placeholder="留空自动生成">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">状态</label>
+              <select name="status" class="form-select">
+                <option value="0" {% if not code or code.status == 0 %}selected{% endif %}>可用</option>
+                <option value="1" {% if code and code.status == 1 %}selected{% endif %}>停用</option>
+              </select>
+            </div>
+            {% if not is_create %}
+            <div class="col-md-6">
+              <label class="form-label">PV</label>
+              <input name="pv" type="number" class="form-control" value="{{ code.pv }}">
+            </div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

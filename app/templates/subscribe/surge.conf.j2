@@ -1,0 +1,19 @@
+{% import "subscribe/_protocols.j2" as proto -%}
+[General]
+loglevel = notify
+
+[Proxy]
+{% for server in servers -%}
+{% set line = proto.line("surge", user, server) | trim -%}
+{% if line %}{{ line }}
+{% endif -%}
+{% endfor %}
+
+[Proxy Group]
+PROXY = select{% for server in servers %}{% set line = proto.line("surge", user, server) | trim %}{% if line %}, {{ server.name }}{% endif %}{% endfor %}, DIRECT
+
+[Rule]
+FINAL,PROXY
+
+[Panel]
+SubscribeInfo = title={{ app_name }}订阅信息, content=上传流量：{{ user.upload_gb }}GB\n下载流量：{{ user.download_gb }}GB\n已用流量：{{ user.used_gb }}GB\n套餐流量：{{ user.total_gb }}GB\n到期时间：{{ user.expired_at_text }}

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css">
+</head>
+<body class="d-flex flex-column">
+  <div class="page page-center">
+    <div class="container container-tight py-4">
+      <form class="card card-md" method="post" action="/admin/login" autocomplete="off">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="card-body">
+          <h2 class="h2 text-center mb-4">后台登录</h2>
+          {% if error %}
+          <div class="alert alert-danger">{{ error }}</div>
+          {% endif %}
+          <div class="mb-3">
+            <label class="form-label">邮箱</label>
+            <input name="email" type="email" class="form-control" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">密码</label>
+            <input name="password" type="password" class="form-control" required>
+          </div>
+          <div class="form-footer">
+            <button type="submit" class="btn btn-primary w-100">登录</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

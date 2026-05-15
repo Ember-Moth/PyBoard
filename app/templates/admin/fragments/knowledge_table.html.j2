@@ -1,0 +1,57 @@
+{% set total_pages = ((data.total + data.size - 1) // data.size) if data.size else 1 %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">知识列表</div>
+    <div class="ms-auto text-secondary">第 {{ data.page }} 页 / 共 {{ data.total }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>标题</th>
+          <th>语言</th>
+          <th>分类</th>
+          <th>排序</th>
+          <th>状态</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in data.items %}
+        <tr>
+          <td>{{ item.id }}</td>
+          <td>{{ item.title }}</td>
+          <td>{{ item.language }}</td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.sort or '-' }}</td>
+          <td>{% if item.show %}<span class="badge bg-green-lt">展示</span>{% else %}<span class="badge bg-secondary-lt">隐藏</span>{% endif %}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/knowledge/form?knowledge_id={{ item.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>
+              <form hx-post="/admin/actions/knowledge/{{ item.id }}/delete" hx-target="#knowledge-table" hx-swap="innerHTML" hx-confirm="确认删除该知识？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="page_no" value="{{ data.page }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-secondary py-4">暂无知识</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">每页 {{ data.size }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if data.page > 1 %}
+      <button class="btn" hx-get="/admin/fragments/knowledge/table?page_no={{ data.page - 1 }}&size={{ data.size }}" hx-target="#knowledge-table">上一页</button>
+      {% endif %}
+      {% if data.page < total_pages %}
+      <button class="btn" hx-get="/admin/fragments/knowledge/table?page_no={{ data.page + 1 }}&size={{ data.size }}" hx-target="#knowledge-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

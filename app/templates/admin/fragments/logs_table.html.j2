@@ -1,0 +1,98 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">系统事件</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="card-body border-bottom">
+    <form class="row g-2 align-items-end" hx-get="/admin/fragments/logs/table" hx-target="#logs-table" hx-swap="innerHTML">
+      <input type="hidden" name="offset" value="0">
+      <input type="hidden" name="limit" value="{{ limit }}">
+      <div class="col-12 col-md-4">
+        <label class="form-label">搜索内容</label>
+        <input class="form-control" name="q" value="{{ filters.q }}" placeholder="路径、事件、请求 ID">
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">日志类型</label>
+        <select class="form-select" name="category">
+          <option value="">全部类型</option>
+          <option value="access" {% if filters.category == "access" %}selected{% endif %}>访问</option>
+          <option value="queue" {% if filters.category == "queue" %}selected{% endif %}>队列</option>
+          <option value="mail" {% if filters.category == "mail" %}selected{% endif %}>邮件</option>
+          <option value="commission" {% if filters.category == "commission" %}selected{% endif %}>佣金</option>
+          <option value="audit" {% if filters.category == "audit" %}selected{% endif %}>审计</option>
+          <option value="system" {% if filters.category == "system" %}selected{% endif %}>系统</option>
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <label class="form-label">严重程度</label>
+        <select class="form-select" name="level">
+          <option value="">全部级别</option>
+          <option value="info" {% if filters.level == "info" %}selected{% endif %}>信息</option>
+          <option value="warning" {% if filters.level == "warning" %}selected{% endif %}>警告</option>
+          <option value="error" {% if filters.level == "error" %}selected{% endif %}>错误</option>
+        </select>
+      </div>
+      <div class="col-12 col-md-2">
+        <button class="btn btn-primary w-100" type="submit">筛选</button>
+      </div>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead><tr><th>编号</th><th>类型</th><th>级别</th><th>事件</th><th>请求</th><th>状态</th><th>耗时</th><th>来源地址</th><th>创建时间</th><th class="w-1"></th></tr></thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.id }}</td>
+          <td>
+            {% if log.category == "access" %}<span class="badge bg-blue-lt">访问</span>
+            {% elif log.category == "queue" %}<span class="badge bg-purple-lt">队列</span>
+            {% elif log.category == "mail" %}<span class="badge bg-cyan-lt">邮件</span>
+            {% elif log.category == "commission" %}<span class="badge bg-yellow-lt">佣金</span>
+            {% elif log.category == "audit" %}<span class="badge bg-green-lt">审计</span>
+            {% else %}<span class="badge bg-secondary-lt">{{ log.category }}</span>{% endif %}
+          </td>
+          <td>
+            {% if log.level == "error" %}<span class="badge bg-red-lt">错误</span>
+            {% elif log.level == "warning" %}<span class="badge bg-yellow-lt">警告</span>
+            {% else %}<span class="badge bg-teal-lt">信息</span>{% endif %}
+          </td>
+          <td>
+            <div class="text-truncate" style="max-width: 260px">{{ log.message }}</div>
+            <div class="text-secondary small">{{ log.event }}</div>
+          </td>
+          <td>
+            {% if log.method or log.path %}
+            <div><span class="text-secondary">{{ log.method or "-" }}</span> <code>{{ log.path or "-" }}</code></div>
+            {% else %}-{% endif %}
+          </td>
+          <td>{{ log.status_code or "-" }}</td>
+          <td>{% if log.duration_ms is not none %}{{ log.duration_ms }}ms{% else %}-{% endif %}</td>
+          <td>{{ log.ip or "-" }}</td>
+          <td>{{ log.created_at }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/logs/detail?log_id={{ log.id }}" hx-target="#modal-root" hx-swap="innerHTML">详情</button>
+              <form hx-post="/admin/actions/logs/{{ log.id }}/delete" hx-target="#logs-table" hx-swap="innerHTML" hx-confirm="确认删除该日志？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="offset" value="{{ offset }}">
+                <input type="hidden" name="limit" value="{{ limit }}">
+                <input type="hidden" name="q" value="{{ filters.q }}">
+                <input type="hidden" name="category" value="{{ filters.category }}">
+                <input type="hidden" name="level" value="{{ filters.level }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="10" class="text-center text-secondary py-4">暂无系统事件</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex justify-content-between">
+    <button class="btn" type="button" {% if offset <= 0 %}disabled{% endif %} hx-get="/admin/fragments/logs/table?offset={{ [offset - limit, 0]|max }}&limit={{ limit }}&q={{ filters.q|urlencode }}&category={{ filters.category|urlencode }}&level={{ filters.level|urlencode }}" hx-target="#logs-table" hx-swap="innerHTML">上一页</button>
+    <button class="btn" type="button" hx-get="/admin/fragments/logs/table?offset={{ offset + limit }}&limit={{ limit }}&q={{ filters.q|urlencode }}&category={{ filters.category|urlencode }}&level={{ filters.level|urlencode }}" hx-target="#logs-table" hx-swap="innerHTML">下一页</button>
+  </div>
+</div>

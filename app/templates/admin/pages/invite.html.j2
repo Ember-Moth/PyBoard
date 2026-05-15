@@ -1,0 +1,25 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">邀请返利</h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <button class="btn btn-primary" type="button" hx-get="/admin/fragments/invite/code-form" hx-target="#modal-root" hx-swap="innerHTML">创建邀请码</button>
+    </div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-12">
+    <div id="invite-codes-table" hx-get="/admin/fragments/invite/codes" hx-trigger="load" hx-target="#invite-codes-table" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载邀请码...</div>
+    </div>
+  </div>
+  <div class="col-12">
+    <div id="commission-logs-table" hx-get="/admin/fragments/invite/commission-logs" hx-trigger="load" hx-target="#commission-logs-table" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载佣金记录...</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

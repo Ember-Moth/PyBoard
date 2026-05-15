@@ -1,0 +1,32 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">日志 #{{ log.id }}</h5>
+        <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+      </div>
+      <div class="modal-body">
+        <dl class="row">
+          <dt class="col-3">事件说明</dt><dd class="col-9">{{ log.message }}</dd>
+          <dt class="col-3">日志类型</dt><dd class="col-9">{{ log.category }}</dd>
+          <dt class="col-3">严重程度</dt><dd class="col-9">{{ log.level }}</dd>
+          <dt class="col-3">事件名称</dt><dd class="col-9"><code>{{ log.event }}</code></dd>
+          <dt class="col-3">请求 ID</dt><dd class="col-9"><code>{{ log.request_id or "-" }}</code></dd>
+          <dt class="col-3">链路 ID</dt><dd class="col-9"><code>{{ log.trace_id or "-" }}</code></dd>
+          <dt class="col-3">请求地址</dt><dd class="col-9"><code>{{ log.path or "-" }}</code></dd>
+          <dt class="col-3">请求方法</dt><dd class="col-9">{{ log.method or "-" }}</dd>
+          <dt class="col-3">响应状态</dt><dd class="col-9">{{ log.status_code or "-" }}</dd>
+          <dt class="col-3">处理耗时</dt><dd class="col-9">{% if log.duration_ms is not none %}{{ log.duration_ms }}ms{% else %}-{% endif %}</dd>
+          <dt class="col-3">来源地址</dt><dd class="col-9">{{ log.ip or "-" }}</dd>
+          <dt class="col-3">客户端</dt><dd class="col-9">{{ log.user_agent or "-" }}</dd>
+          <dt class="col-3">操作者</dt><dd class="col-9">{{ log.actor_type or "-" }}{% if log.actor_id %} #{{ log.actor_id }}{% endif %}</dd>
+          <dt class="col-3">目标对象</dt><dd class="col-9">{{ log.target_type or "-" }}{% if log.target_id %} #{{ log.target_id }}{% endif %}</dd>
+          <dt class="col-3">事件数据</dt><dd class="col-9"><pre class="mb-0">{{ log.data or "" }}</pre></dd>
+          <dt class="col-3">错误类型</dt><dd class="col-9">{{ log.error_type or "-" }}</dd>
+          <dt class="col-3">错误堆栈</dt><dd class="col-9"><pre class="mb-0">{{ log.error_stack or "" }}</pre></dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

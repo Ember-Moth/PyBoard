@@ -1,0 +1,43 @@
+{% set is_create = route is none %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/servers/routes{% else %}/admin/actions/servers/routes/{{ route.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建路由规则{% else %}编辑路由规则 #{{ route.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">规则名称</label>
+              <input name="remarks" class="form-control" value="{{ route.remarks if route else '' }}" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">处理方式</label>
+              <select name="action" class="form-select">
+                {% for action in actions %}
+                <option value="{{ action }}" {% if route and route.action == action %}selected{% endif %}>{{ action }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">处理参数</label>
+              <input name="action_value" class="form-control" value="{{ route.action_value if route and route.action_value else '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">匹配内容</label>
+              <textarea name="match" class="form-control" rows="5">{{ route.match | join('&#10;') if route and route.match is sequence and route.match is not string else (route.match if route else '') }}</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

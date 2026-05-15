@@ -1,0 +1,33 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/coupons/generate" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">批量生成优惠券</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">名称</label><input name="name" class="form-control" required></div>
+            <div class="col-md-3"><label class="form-label">数量</label><input name="generate_count" type="number" min="1" max="500" value="1" class="form-control" required></div>
+            <div class="col-md-3"><label class="form-label">类型</label><select name="type" class="form-select"><option value="1">固定金额</option><option value="2">百分比</option></select></div>
+            <div class="col-md-4"><label class="form-label">面值</label><input name="value" type="number" min="1" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">开始时间戳</label><input name="started_at" type="number" min="0" class="form-control" required></div>
+            <div class="col-md-4"><label class="form-label">结束时间戳</label><input name="ended_at" type="number" min="0" class="form-control" required></div>
+            <div class="col-md-6"><label class="form-label">总次数</label><input name="limit_use" type="number" min="0" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">单用户次数</label><input name="limit_use_with_user" type="number" min="0" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">适用套餐</label><input name="limit_plan_ids" class="form-control"></div>
+            <div class="col-md-6"><label class="form-label">限制周期</label><input name="limit_period" class="form-control"></div>
+            <div class="col-12"><label class="form-check"><input class="form-check-input" type="checkbox" name="show" value="1" checked><span class="form-check-label">启用</span></label></div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">生成</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

@@ -1,0 +1,71 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">用户管理</h2>
+    </div>
+    <div class="col-auto ms-auto btn-list">
+      <button
+        class="btn btn-outline-primary"
+        type="button"
+        hx-get="/admin/fragments/users/generate-form"
+        hx-include="#user-filters"
+        hx-target="#modal-root"
+        hx-swap="innerHTML">
+        批量生成
+      </button>
+      <button
+        class="btn btn-primary"
+        type="button"
+        hx-get="/admin/fragments/users/create-form"
+        hx-include="#user-filters"
+        hx-target="#modal-root"
+        hx-swap="innerHTML">
+        创建用户
+      </button>
+    </div>
+  </div>
+</div>
+<form
+  id="user-filters"
+  class="row g-2 align-items-end mb-3"
+  hx-get="/admin/fragments/users/table"
+  hx-target="#users-table"
+  hx-swap="innerHTML">
+  <input type="hidden" name="offset" value="0">
+  <div class="col-12 col-md-5 col-xl-4">
+    <label class="form-label">搜索</label>
+    <input class="form-control" name="q" placeholder="邮箱或用户 ID">
+  </div>
+  <div class="col-6 col-md-3 col-xl-2">
+    <label class="form-label">状态</label>
+    <select class="form-select" name="status">
+      <option value="">全部</option>
+      <option value="active">正常</option>
+      <option value="banned">已封禁</option>
+      <option value="admin">管理员</option>
+      <option value="staff">员工</option>
+    </select>
+  </div>
+  <div class="col-6 col-md-2 col-xl-2">
+    <label class="form-label">每页</label>
+    <select class="form-select" name="limit">
+      <option value="20">20</option>
+      <option value="50">50</option>
+      <option value="100">100</option>
+    </select>
+  </div>
+  <div class="col-12 col-md-auto">
+    <button class="btn btn-primary w-100" type="submit">筛选</button>
+  </div>
+</form>
+<div
+  id="users-table"
+  hx-get="/admin/fragments/users/table"
+  hx-trigger="load"
+  hx-target="#users-table"
+  hx-swap="innerHTML">
+  <div class="text-secondary">正在加载...</div>
+</div>
+{% endblock %}

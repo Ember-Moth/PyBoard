@@ -1,0 +1,17 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">系统配置</h2>
+    </div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-12">
+    <div id="settings-groups" hx-get="/admin/fragments/settings/groups" hx-trigger="load" hx-target="#settings-groups" hx-swap="innerHTML">
+      <div class="text-secondary">正在加载配置分组...</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

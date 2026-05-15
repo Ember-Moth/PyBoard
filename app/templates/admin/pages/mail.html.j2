@@ -1,0 +1,16 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">邮件管理</h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <button class="btn btn-primary" type="button" hx-get="/admin/fragments/mail/send-form" hx-target="#modal-root" hx-swap="innerHTML">发送邮件</button>
+    </div>
+  </div>
+</div>
+<div id="mail-logs" hx-get="/admin/fragments/mail/logs" hx-trigger="load" hx-target="#mail-logs" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载邮件日志...</div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+"""队列名常量。"""
+
+QUEUE_DEFAULT = "default"
+QUEUE_ORDER_HANDLE = "order_handle"
+QUEUE_SEND_EMAIL = "send_email"
+QUEUE_SEND_TELEGRAM = "send_telegram"
+QUEUE_STAT = "stat"
+QUEUE_TRAFFIC_FETCH = "traffic_fetch"
+
+QUEUE_NAMES = [
+    QUEUE_DEFAULT,
+    QUEUE_ORDER_HANDLE,
+    QUEUE_SEND_EMAIL,
+    QUEUE_SEND_TELEGRAM,
+    QUEUE_TRAFFIC_FETCH,
+    QUEUE_STAT,
+]

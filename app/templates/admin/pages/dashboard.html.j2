@@ -1,0 +1,10 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div
+  hx-get="/admin/fragments/dashboard/overview"
+  hx-trigger="load"
+  hx-target="this"
+  hx-swap="innerHTML">
+  <div class="text-secondary">正在加载...</div>
+</div>
+{% endblock %}

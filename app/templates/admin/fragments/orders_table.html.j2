@@ -1,0 +1,86 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">订单列表</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>交易号</th>
+          <th>用户编号</th>
+          <th>套餐编号</th>
+          <th>周期</th>
+          <th>金额</th>
+          <th>状态</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+        <tr>
+          <td>{{ order.id }}</td>
+          <td><code>{{ order.trade_no }}</code></td>
+          <td>{{ order.user_id }}</td>
+          <td>{{ order.plan_id }}</td>
+          <td>{{ order.period }}</td>
+          <td>{{ "%.2f" % (order.total_amount / 100) }}</td>
+          <td>
+            {% if order.status == 0 %}
+            <span class="badge bg-yellow-lt">待支付</span>
+            {% elif order.status == 1 %}
+            <span class="badge bg-blue-lt">开通中</span>
+            {% elif order.status == 2 %}
+            <span class="badge bg-secondary-lt">已取消</span>
+            {% elif order.status == 3 %}
+            <span class="badge bg-green-lt">已完成</span>
+            {% elif order.status == 4 %}
+            <span class="badge bg-purple-lt">已折抵</span>
+            {% else %}
+            <span class="badge bg-secondary-lt">{{ order.status }}</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if order.status == 0 %}
+            <div class="btn-list flex-nowrap">
+              <form
+                hx-post="/admin/actions/orders/{{ order.trade_no }}/paid"
+                hx-target="#orders-table"
+                hx-swap="innerHTML"
+                hx-confirm="确认将该订单标记为已支付并开通？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-success" type="submit">标记支付</button>
+              </form>
+              <form
+                hx-post="/admin/actions/orders/{{ order.trade_no }}/cancel"
+                hx-target="#orders-table"
+                hx-swap="innerHTML"
+                hx-confirm="确认取消该订单？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">取消</button>
+              </form>
+            </div>
+            {% else %}
+            <span class="text-secondary">-</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-secondary py-4">暂无订单</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">共显示 {{ orders | length }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if offset > 0 %}
+      <button class="btn" hx-get="/admin/fragments/orders/table?offset={{ [offset - limit, 0] | max }}&limit={{ limit }}" hx-target="#orders-table">上一页</button>
+      {% endif %}
+      {% if orders | length == limit %}
+      <button class="btn" hx-get="/admin/fragments/orders/table?offset={{ offset + limit }}&limit={{ limit }}" hx-target="#orders-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

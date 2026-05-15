@@ -1,0 +1,42 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/mail/send" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">发送邮件</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">收件人</label>
+              <input name="email" type="email" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">模板</label>
+              <select name="template_name" class="form-select">
+                {% for item in templates %}
+                <option value="{{ item }}">{{ item }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">主题</label>
+              <input name="subject" class="form-control" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">模板变量</label>
+              <textarea name="template_value" class="form-control" rows="6">{"name":"PyBoard","content":"","url":""}</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">发送</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

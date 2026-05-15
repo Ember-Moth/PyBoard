@@ -1,0 +1,28 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">套餐管理</h2>
+    </div>
+    <div class="col-auto ms-auto">
+      <button
+        class="btn btn-primary"
+        type="button"
+        hx-get="/admin/fragments/plans/form"
+        hx-target="#modal-root"
+        hx-swap="innerHTML">
+        创建套餐
+      </button>
+    </div>
+  </div>
+</div>
+<div
+  id="plans-table"
+  hx-get="/admin/fragments/plans/table"
+  hx-trigger="load"
+  hx-target="#plans-table"
+  hx-swap="innerHTML">
+  <div class="text-secondary">正在加载...</div>
+</div>
+{% endblock %}

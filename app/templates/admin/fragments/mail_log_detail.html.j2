@@ -1,0 +1,20 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">邮件日志 #{{ log.id }}</h5>
+        <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+      </div>
+      <div class="modal-body">
+        <dl class="row">
+          <dt class="col-3">收件人</dt><dd class="col-9">{{ log.email }}</dd>
+          <dt class="col-3">主题</dt><dd class="col-9">{{ log.subject }}</dd>
+          <dt class="col-3">模板</dt><dd class="col-9"><code>{{ log.template_name }}</code></dd>
+          <dt class="col-3">错误</dt><dd class="col-9"><pre class="mb-0">{{ log.error or "" }}</pre></dd>
+          <dt class="col-3">创建时间</dt><dd class="col-9">{{ log.created_at }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

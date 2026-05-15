@@ -1,0 +1,45 @@
+{% set is_create = notice is none %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/notices{% else %}/admin/actions/notices/{{ notice.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建公告{% else %}编辑公告 #{{ notice.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">标题</label>
+              <input name="title" class="form-control" value="{{ notice.title if notice else '' }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">图片 URL</label>
+              <input name="img_url" class="form-control" value="{{ notice.img_url if notice and notice.img_url else '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">标签</label>
+              <input name="tags" class="form-control" value="{{ notice.tags if notice and notice.tags else '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">内容</label>
+              <textarea name="content" class="form-control" rows="8" required>{{ notice.content if notice else '' }}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-check">
+                <input class="form-check-input" type="checkbox" name="show" value="1" {% if notice and notice.show %}checked{% endif %}>
+                <span class="form-check-label">展示</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

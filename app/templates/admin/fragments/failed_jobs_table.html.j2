@@ -1,0 +1,39 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">失败任务</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead><tr><th>编号</th><th>队列连接</th><th>队列名称</th><th>失败时间</th><th>记录时间</th><th class="w-1"></th></tr></thead>
+      <tbody>
+        {% for job in jobs %}
+        <tr>
+          <td>{{ job.id }}</td>
+          <td>{{ job.connection }}</td>
+          <td><code>{{ job.queue }}</code></td>
+          <td>{{ job.failed_at }}</td>
+          <td>{{ job.created_at }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/failed-jobs/detail?job_id={{ job.id }}" hx-target="#modal-root" hx-swap="innerHTML">详情</button>
+              <form hx-post="/admin/actions/failed-jobs/{{ job.id }}/retry" hx-target="#failed-jobs-table" hx-swap="innerHTML">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-primary" type="submit">重试</button>
+              </form>
+              <form hx-post="/admin/actions/failed-jobs/{{ job.id }}/delete" hx-target="#failed-jobs-table" hx-swap="innerHTML" hx-confirm="确认删除该失败任务？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="offset" value="{{ offset }}">
+                <input type="hidden" name="limit" value="{{ limit }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">暂无失败任务</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

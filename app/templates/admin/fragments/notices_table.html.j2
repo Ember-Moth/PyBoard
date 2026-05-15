@@ -1,0 +1,55 @@
+{% set total_pages = ((data.total + data.size - 1) // data.size) if data.size else 1 %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">公告列表</div>
+    <div class="ms-auto text-secondary">第 {{ data.page }} 页 / 共 {{ data.total }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>标题</th>
+          <th>标签</th>
+          <th>状态</th>
+          <th>创建时间</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for notice in data.items %}
+        <tr>
+          <td>{{ notice.id }}</td>
+          <td>{{ notice.title }}</td>
+          <td>{{ notice.tags or '-' }}</td>
+          <td>{% if notice.show %}<span class="badge bg-green-lt">展示</span>{% else %}<span class="badge bg-secondary-lt">隐藏</span>{% endif %}</td>
+          <td>{{ notice.created_at }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/notices/form?notice_id={{ notice.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>
+              <form hx-post="/admin/actions/notices/{{ notice.id }}/delete" hx-target="#notices-table" hx-swap="innerHTML" hx-confirm="确认删除该公告？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="page_no" value="{{ data.page }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-secondary py-4">暂无公告</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">每页 {{ data.size }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if data.page > 1 %}
+      <button class="btn" hx-get="/admin/fragments/notices/table?page_no={{ data.page - 1 }}&size={{ data.size }}" hx-target="#notices-table">上一页</button>
+      {% endif %}
+      {% if data.page < total_pages %}
+      <button class="btn" hx-get="/admin/fragments/notices/table?page_no={{ data.page + 1 }}&size={{ data.size }}" hx-target="#notices-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">V2Node 节点</div>
+    <div class="ms-auto">
+      <button class="btn btn-sm btn-primary" type="button" hx-get="/admin/fragments/servers/nodes/form" hx-target="#modal-root" hx-swap="innerHTML">创建</button>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>节点名称</th>
+          <th>协议</th>
+          <th>接入地址</th>
+          <th>可用分组</th>
+          <th>倍率</th>
+          <th>状态</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for node in nodes %}
+        <tr>
+          <td>{{ node.id }}</td>
+          <td>{{ node.name }}</td>
+          <td><code>{{ node.protocol }}</code> / {{ node.network }}</td>
+          <td>{{ node.host }}:{{ node.port }} -> {{ node.server_port }}</td>
+          <td>{{ node.group_id | join(", ") if node.group_id is sequence and node.group_id is not string else node.group_id }}</td>
+          <td>{{ node.rate }}</td>
+          <td>{% if node.show %}<span class="badge bg-green-lt">显示</span>{% else %}<span class="badge bg-secondary-lt">隐藏</span>{% endif %}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/servers/nodes/form?node_id={{ node.id }}" hx-target="#modal-root" hx-swap="innerHTML">编辑</button>
+              <form hx-post="/admin/actions/servers/nodes/{{ node.id }}/copy" hx-target="#server-nodes-table" hx-swap="innerHTML">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-secondary" type="submit">复制</button>
+              </form>
+              <form hx-post="/admin/actions/servers/nodes/{{ node.id }}/delete" hx-target="#server-nodes-table" hx-swap="innerHTML" hx-confirm="确认删除该节点？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-secondary py-4">暂无节点</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,159 @@
+{% set is_create = node is none %}
+{% set group_text = node.group_id | join(',') if node and node.group_id is sequence and node.group_id is not string else (node.group_id if node else '') %}
+{% set route_text = node.route_id | join(',') if node and node.route_id is sequence and node.route_id is not string else (node.route_id if node and node.route_id else '') %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/servers/nodes{% else %}/admin/actions/servers/nodes/{{ node.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建节点{% else %}编辑节点 #{{ node.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label class="form-label">节点名称</label>
+              <input name="name" class="form-control" value="{{ node.name if node else '' }}" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">节点地址</label>
+              <input name="host" class="form-control" value="{{ node.host if node else '' }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">对外端口</label>
+              <input name="port" class="form-control" value="{{ node.port if node else '' }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">后端监听端口</label>
+              <input name="server_port" type="number" class="form-control" value="{{ node.server_port if node else '' }}" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">协议</label>
+              <select name="protocol" class="form-select">
+                {% for protocol in protocols %}
+                <option value="{{ protocol }}" {% if node and node.protocol == protocol %}selected{% endif %}>{{ protocol }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">传输</label>
+              <select name="network" class="form-select">
+                {% for network in networks %}
+                <option value="{{ network }}" {% if node and node.network == network %}selected{% endif %}>{{ network }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">安全层</label>
+              <select name="tls" class="form-select">
+                <option value="0" {% if node and node.tls == 0 %}selected{% endif %}>关闭</option>
+                <option value="1" {% if not node or node.tls == 1 %}selected{% endif %}>TLS</option>
+                <option value="2" {% if node and node.tls == 2 %}selected{% endif %}>Reality</option>
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">倍率</label>
+              <input name="rate" class="form-control" value="{{ node.rate if node else '1' }}" required>
+            </div>
+            <div class="col-md-2">
+              <label class="form-label">排序</label>
+              <input name="sort" type="number" class="form-control" value="{{ node.sort if node and node.sort is not none else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">可用分组</label>
+              <input name="group_id" class="form-control" value="{{ group_text }}" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">路由规则</label>
+              <input name="route_id" class="form-control" value="{{ route_text }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">监听地址</label>
+              <input name="listen_ip" class="form-control" value="{{ node.listen_ip if node else '0.0.0.0' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">父级节点</label>
+              <input name="parent_id" type="number" class="form-control" value="{{ node.parent_id if node and node.parent_id is not none else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Shadowsocks 加密方式</label>
+              <input name="cipher" class="form-control" value="{{ node.cipher if node and node.cipher else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">VLESS 流控</label>
+              <input name="flow" class="form-control" value="{{ node.flow if node and node.flow else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">VLESS 加密方式</label>
+              <input name="encryption" class="form-control" value="{{ node.encryption if node and node.encryption else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">拥塞控制</label>
+              <input name="congestion_control" class="form-control" value="{{ node.congestion_control if node and node.congestion_control else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">上行 Mbps</label>
+              <input name="up_mbps" type="number" class="form-control" value="{{ node.up_mbps if node else 0 }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">下行 Mbps</label>
+              <input name="down_mbps" type="number" class="form-control" value="{{ node.down_mbps if node else 0 }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">混淆方式</label>
+              <input name="obfs" class="form-control" value="{{ node.obfs if node and node.obfs else '' }}">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">混淆密码</label>
+              <input name="obfs_password" class="form-control" value="{{ node.obfs_password if node and node.obfs_password else '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">标签</label>
+              <input name="tags" class="form-control" value="{{ node.tags | join(',') if node and node.tags is sequence and node.tags is not string else (node.tags if node and node.tags else '') }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">UDP 中继模式</label>
+              <input name="udp_relay_mode" class="form-control" value="{{ node.udp_relay_mode if node and node.udp_relay_mode else '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">AnyTLS 填充策略</label>
+              <input name="padding_scheme" class="form-control" value="{{ node.padding_scheme | join(',') if node and node.padding_scheme is sequence and node.padding_scheme is not string else (node.padding_scheme if node and node.padding_scheme else '') }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">安全层高级配置</label>
+              <textarea name="tls_settings" class="form-control" rows="4">{{ (node.tls_settings or {}) | tojson if node else '{}' }}</textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">传输高级配置</label>
+              <textarea name="network_settings" class="form-control" rows="4">{{ (node.network_settings or {}) | tojson if node else '{}' }}</textarea>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">加密高级配置</label>
+              <textarea name="encryption_settings" class="form-control" rows="4">{{ (node.encryption_settings or {}) | tojson if node else '{}' }}</textarea>
+            </div>
+            <div class="col-12">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="show" value="1" {% if node and node.show %}checked{% endif %}>
+                <label class="form-check-label">显示</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="disable_sni" value="1" {% if node and node.disable_sni %}checked{% endif %}>
+                <label class="form-check-label">禁用 SNI</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="zero_rtt_handshake" value="1" {% if node and node.zero_rtt_handshake %}checked{% endif %}>
+                <label class="form-check-label">0-RTT</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

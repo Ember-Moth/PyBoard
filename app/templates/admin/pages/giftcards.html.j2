@@ -1,0 +1,17 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">礼品卡管理</h2>
+    </div>
+    <div class="col-auto ms-auto btn-list">
+      <button class="btn btn-outline-primary" type="button" hx-get="/admin/fragments/giftcards/generate-form" hx-target="#modal-root" hx-swap="innerHTML">批量生成</button>
+      <button class="btn btn-primary" type="button" hx-get="/admin/fragments/giftcards/form" hx-target="#modal-root" hx-swap="innerHTML">创建礼品卡</button>
+    </div>
+  </div>
+</div>
+<div id="giftcards-table" hx-get="/admin/fragments/giftcards/table" hx-trigger="load" hx-target="#giftcards-table" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载...</div>
+</div>
+{% endblock %}

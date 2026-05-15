@@ -1,0 +1,20 @@
+<div style="background: linear-gradient(145deg, #f6f8fb 0%, #f0f3f7 100%); padding: 40px 20px;">
+    <div style="max-width: 580px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(32, 43, 54, 0.08);">
+        <!-- Logo区域 -->
+        <div style="padding: 35px 40px; text-align: center; border-bottom: 1px solid #f1f3f5;">
+            <h1 style="margin: 0; font-size: 22px; color: #2c3345; font-weight: 600; letter-spacing: -0.5px;">{{ name }}</h1>
+        </div>
+
+        <!-- 内容区 -->
+        <div style="padding: 40px;">
+            {% block body %}{% endblock %}
+        </div>
+
+        <!-- 底部 -->
+        <div style="padding: 20px; background-color: #f9fafb; text-align: center;">
+            <p style="margin: 0; font-size: 13px; color: #8792a2;">
+                {% block footer %}{% endblock %} · {{ name }}
+            </p>
+        </div>
+    </div>
+</div>

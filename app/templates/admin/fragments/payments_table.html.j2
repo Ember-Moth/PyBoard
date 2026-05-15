@@ -1,0 +1,78 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">支付方式列表</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>名称</th>
+          <th>网关</th>
+          <th>UUID</th>
+          <th>手续费</th>
+          <th>状态</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for payment in payments %}
+        <tr>
+          <td>{{ payment.id }}</td>
+          <td>
+            <div class="fw-medium">{{ payment.name }}</div>
+            {% if payment.notify_domain %}<div class="text-secondary small">{{ payment.notify_domain }}</div>{% endif %}
+          </td>
+          <td>{{ payment.payment }}</td>
+          <td><code>{{ payment.uuid }}</code></td>
+          <td>
+            固定 {{ payment.handling_fee_fixed or 0 }} /
+            {{ payment.handling_fee_percent or 0 }}%
+          </td>
+          <td>
+            {% if payment.enable %}
+            <span class="badge bg-green-lt">启用</span>
+            {% else %}
+            <span class="badge bg-secondary-lt">停用</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button
+                class="btn btn-sm"
+                type="button"
+                hx-get="/admin/fragments/payments/form?payment_id={{ payment.id }}"
+                hx-target="#modal-root"
+                hx-swap="innerHTML">
+                编辑
+              </button>
+              <form
+                hx-post="/admin/actions/payments/{{ payment.id }}/delete"
+                hx-target="#payments-table"
+                hx-swap="innerHTML"
+                hx-confirm="确认删除该支付方式？">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-secondary py-4">暂无支付方式</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">共显示 {{ payments | length }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if offset > 0 %}
+      <button class="btn" hx-get="/admin/fragments/payments/table?offset={{ [offset - limit, 0] | max }}&limit={{ limit }}" hx-target="#payments-table">上一页</button>
+      {% endif %}
+      {% if payments | length == limit %}
+      <button class="btn" hx-get="/admin/fragments/payments/table?offset={{ offset + limit }}&limit={{ limit }}" hx-target="#payments-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>

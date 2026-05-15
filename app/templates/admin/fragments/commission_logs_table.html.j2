@@ -1,0 +1,36 @@
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">佣金记录</div>
+    <div class="ms-auto text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>邀请人</th>
+          <th>被邀请用户</th>
+          <th>订单号</th>
+          <th>订单金额</th>
+          <th>佣金</th>
+          <th>创建时间</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+        <tr>
+          <td>{{ log.id }}</td>
+          <td>{{ log.invite_user_id }}</td>
+          <td>{{ log.user_id }}</td>
+          <td><code>{{ log.trade_no }}</code></td>
+          <td>{{ "%.2f"|format(log.order_amount / 100) }}</td>
+          <td>{{ "%.2f"|format(log.get_amount / 100) }}</td>
+          <td>{{ log.created_at }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-secondary py-4">暂无佣金记录</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,9 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <h2 class="page-title">系统状态</h2>
+</div>
+<div id="system-status" hx-get="/admin/fragments/system/status" hx-trigger="load" hx-target="#system-status" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载系统状态...</div>
+</div>
+{% endblock %}

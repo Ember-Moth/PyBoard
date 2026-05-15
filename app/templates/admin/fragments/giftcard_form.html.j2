@@ -1,0 +1,43 @@
+{% set is_create = giftcard is none %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/giftcards{% else %}/admin/actions/giftcards/{{ giftcard.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建礼品卡{% else %}编辑礼品卡 #{{ giftcard.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">名称</label><input name="name" class="form-control" value="{{ giftcard.name if giftcard else '' }}" required></div>
+            <div class="col-md-6"><label class="form-label">卡号</label><input name="code" class="form-control" value="{{ giftcard.code if giftcard else '' }}" placeholder="留空自动生成"></div>
+            <div class="col-md-4">
+              <label class="form-label">类型</label>
+              <select name="type" class="form-select" required>
+                <option value="1" {% if giftcard and giftcard.type == 1 %}selected{% endif %}>余额</option>
+                <option value="2" {% if giftcard and giftcard.type == 2 %}selected{% endif %}>时长</option>
+                <option value="3" {% if giftcard and giftcard.type == 3 %}selected{% endif %}>流量</option>
+                <option value="4" {% if giftcard and giftcard.type == 4 %}selected{% endif %}>重置</option>
+                <option value="5" {% if giftcard and giftcard.type == 5 %}selected{% endif %}>套餐</option>
+              </select>
+            </div>
+            <div class="col-md-4"><label class="form-label">面值</label><input name="value" type="number" min="0" class="form-control" value="{{ giftcard.value if giftcard and giftcard.value is not none else '' }}"></div>
+            <div class="col-md-4"><label class="form-label">绑定套餐</label><input name="plan_id" type="number" min="1" class="form-control" value="{{ giftcard.plan_id if giftcard and giftcard.plan_id else '' }}"></div>
+            <div class="col-md-4"><label class="form-label">总次数</label><input name="limit_use" type="number" min="0" class="form-control" value="{{ giftcard.limit_use if giftcard and giftcard.limit_use is not none else '' }}"></div>
+            <div class="col-md-4"><label class="form-label">开始时间戳</label><input name="started_at" type="number" min="0" class="form-control" value="{{ giftcard.started_at if giftcard else '' }}" required></div>
+            <div class="col-md-4"><label class="form-label">结束时间戳</label><input name="ended_at" type="number" min="0" class="form-control" value="{{ giftcard.ended_at if giftcard else '' }}" required></div>
+            {% if giftcard %}
+            <div class="col-12"><label class="form-label">已使用用户列表</label><input name="used_user_ids" class="form-control" value="{{ giftcard.used_user_ids if giftcard.used_user_ids else '' }}"></div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

@@ -1,0 +1,14 @@
+{% import "subscribe/_protocols.j2" as proto -%}
+{
+  "log": {"level": "warn", "timestamp": true},
+  "outbounds": [
+    {"type": "selector", "tag": "proxy", "outbounds": [{% for server in servers %}{{ server.name | to_json }}, {% endfor %}"direct"]},
+    {"type": "urltest", "tag": "auto", "outbounds": [{% for server in servers %}{{ server.name | to_json }}{% if not loop.last %}, {% endif %}{% endfor %}]},
+    {"type": "direct", "tag": "direct"},
+    {"type": "block", "tag": "block"}{% if servers %},{% endif %}
+{% for server in servers %}
+    {{ proto.singbox_outbound(user, server, singbox_old) | trim }}{% if not loop.last %},{% endif %}
+{% endfor %}
+  ],
+  "route": {"final": "proxy"}
+}

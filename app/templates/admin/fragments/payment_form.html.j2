@@ -1,0 +1,72 @@
+{% set is_create = payment is none %}
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="{% if is_create %}/admin/actions/payments{% else %}/admin/actions/payments/{{ payment.id }}{% endif %}" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">{% if is_create %}创建支付方式{% else %}编辑支付方式 #{{ payment.id }}{% endif %}</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">渠道名称</label>
+              <input name="name" class="form-control" value="{{ payment.name if payment else '' }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">支付网关</label>
+              <select name="payment" class="form-select" required>
+                {% for gateway in gateways %}
+                <option value="{{ gateway.payment }}" {% if payment and payment.payment == gateway.payment %}selected{% endif %}>
+                  {{ gateway.name }} ({{ gateway.payment }})
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">图标地址</label>
+              <input name="icon" class="form-control" value="{{ payment.icon if payment and payment.icon else '' }}">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">通知域名</label>
+              <input name="notify_domain" class="form-control" value="{{ payment.notify_domain if payment and payment.notify_domain else '' }}" placeholder="https://example.com">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">固定手续费（分）</label>
+              <input name="handling_fee_fixed" type="number" min="0" class="form-control" value="{{ payment.handling_fee_fixed if payment and payment.handling_fee_fixed is not none else '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">百分比手续费</label>
+              <input name="handling_fee_percent" type="number" min="0" step="0.01" class="form-control" value="{{ payment.handling_fee_percent if payment and payment.handling_fee_percent is not none else '' }}">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">排序</label>
+              <input name="sort" type="number" min="0" class="form-control" value="{{ payment.sort if payment and payment.sort is not none else '' }}">
+            </div>
+            <div class="col-12">
+              <label class="form-label">网关配置</label>
+              <textarea name="config" class="form-control font-monospace" rows="8" required>{% if payment %}{{ payment.config | tojson }}{% else %}{
+  "url": "https://pay.example.com",
+  "pid": "",
+  "key": "",
+  "type": "alipay"
+}{% endif %}</textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-check">
+                <input class="form-check-input" type="checkbox" name="enable" value="1" {% if payment and payment.enable %}checked{% endif %}>
+                <span class="form-check-label">启用</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">{% if is_create %}创建{% else %}保存{% endif %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

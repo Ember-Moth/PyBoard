@@ -1,0 +1,13 @@
+{% extends "admin/layouts/shell.html.j2" %}
+{% block content %}
+<div class="page-header d-print-none">
+  <div class="row g-2 align-items-center">
+    <div class="col">
+      <h2 class="page-title">工单管理</h2>
+    </div>
+  </div>
+</div>
+<div id="tickets-table" hx-get="/admin/fragments/tickets/table" hx-trigger="load" hx-target="#tickets-table" hx-swap="innerHTML">
+  <div class="text-secondary">正在加载工单...</div>
+</div>
+{% endblock %}

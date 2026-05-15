@@ -1,0 +1,22 @@
+{% extends "mail/base.html" %}
+
+{% block body %}
+<div style="text-align: center; margin-bottom: 35px;">
+    <div style="width: 64px; height: 64px; background-color: #f0f3f7; border-radius: 50%; display: inline-block; line-height: 64px; font-size: 32px; color: #2c3345;">#</div>
+    <h2 style="margin: 20px 0 0; font-size: 20px; color: #2c3345; font-weight: 600;">验证码</h2>
+</div>
+
+<div style="margin: 35px 0; text-align: center;">
+    <div style="display: inline-block; padding: 24px 40px; background: linear-gradient(145deg, #f9fafb 0%, #f5f7f9 100%); border: 1px solid #e9ecef; border-radius: 12px;">
+        <span style="font-family: 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 32px; font-weight: 500; letter-spacing: 8px; color: #2c3345;">{{ code }}</span>
+    </div>
+</div>
+
+<div style="margin: 40px 0 0; padding-top: 24px; border-top: 1px dashed #e9ecef;">
+    <p style="margin: 0; font-size: 13px; color: #8792a2; line-height: 1.6; text-align: center;">
+        验证码有效期为 5 分钟，如非本人操作请忽略。
+    </p>
+</div>
+{% endblock %}
+
+{% block footer %}安全邮件提醒{% endblock %}

@@ -1,0 +1,132 @@
+{% set labels = {
+  "site": "站点信息", "safe": "注册与安全", "frontend": "前端外观", "subscribe": "订阅策略",
+  "server": "节点通信", "email": "邮件服务", "telegram": "Telegram", "invite": "邀请返佣",
+  "ticket": "工单策略", "deposit": "充值赠送", "app": "客户端下载"
+} %}
+{% set field_labels = {
+  "ticket_status": "工单开放策略",
+  "deposit_bounus": "充值赠送规则",
+  "invite_force": "注册必须填写邀请码",
+  "invite_commission": "默认返佣比例",
+  "invite_gen_limit": "每人可生成邀请码数量",
+  "invite_never_expire": "邀请码长期有效",
+  "commission_first_time_enable": "仅首单返佣",
+  "commission_auto_check_enable": "自动确认佣金",
+  "commission_withdraw_limit": "最低提现金额",
+  "commission_withdraw_method": "可用提现方式",
+  "withdraw_close_enable": "关闭佣金提现",
+  "commission_distribution_enable": "开启多级分销",
+  "commission_distribution_l1": "一级分销比例",
+  "commission_distribution_l2": "二级分销比例",
+  "commission_distribution_l3": "三级分销比例",
+  "logo": "站点 Logo",
+  "force_https": "强制 HTTPS",
+  "stop_register": "暂停新用户注册",
+  "app_name": "应用名称",
+  "app_description": "应用简介",
+  "app_url": "站点访问地址",
+  "subscribe_url": "订阅地址",
+  "subscribe_path": "订阅路径",
+  "try_out_plan_id": "试用套餐编号",
+  "try_out_hour": "试用时长（小时）",
+  "tos_url": "服务条款地址",
+  "currency": "结算币种",
+  "currency_symbol": "货币符号",
+  "plan_change_enable": "允许用户变更套餐",
+  "reset_traffic_method": "流量重置方式",
+  "surplus_enable": "启用剩余价值折抵",
+  "allow_new_period": "允许购买新周期",
+  "new_order_event_id": "新购事件编号",
+  "renew_order_event_id": "续费事件编号",
+  "change_order_event_id": "变更套餐事件编号",
+  "show_info_to_server_enable": "向节点下发订阅信息",
+  "show_subscribe_method": "订阅展示方式",
+  "show_subscribe_expire": "订阅过期提醒天数",
+  "frontend_theme": "当前主题",
+  "frontend_theme_sidebar": "侧栏样式",
+  "frontend_theme_header": "页头样式",
+  "frontend_theme_color": "主题色",
+  "frontend_background_url": "背景图地址",
+  "server_api_url": "节点 API 地址",
+  "server_token": "节点通信密钥",
+  "server_pull_interval": "节点拉取间隔（秒）",
+  "server_push_interval": "节点上报间隔（秒）",
+  "server_node_report_min_traffic": "节点上报最小流量",
+  "server_device_online_min_traffic": "设备在线最小流量",
+  "device_limit_mode": "设备限制统计方式",
+  "email_template": "邮件模板",
+  "email_host": "SMTP 主机",
+  "email_port": "SMTP 端口",
+  "email_username": "SMTP 用户名",
+  "email_password": "SMTP 密码",
+  "email_encryption": "SMTP 加密方式",
+  "email_from_address": "发件邮箱",
+  "telegram_bot_enable": "启用 Telegram 机器人",
+  "telegram_bot_token": "Telegram Bot Token",
+  "telegram_discuss_link": "Telegram 讨论群链接",
+  "windows_version": "Windows 客户端版本",
+  "windows_download_url": "Windows 下载地址",
+  "macos_version": "macOS 客户端版本",
+  "macos_download_url": "macOS 下载地址",
+  "android_version": "Android 客户端版本",
+  "android_download_url": "Android 下载地址",
+  "email_verify": "启用邮箱验证码",
+  "safe_mode_enable": "启用安全模式",
+  "secure_path": "后台安全路径",
+  "email_whitelist_enable": "启用邮箱后缀白名单",
+  "email_whitelist_suffix": "允许注册的邮箱后缀",
+  "email_gmail_limit_enable": "限制 Gmail 别名注册",
+  "recaptcha_enable": "启用人机验证",
+  "recaptcha_key": "人机验证服务密钥",
+  "recaptcha_site_key": "人机验证站点密钥",
+  "register_limit_by_ip_enable": "限制同 IP 注册",
+  "register_limit_count": "同 IP 注册次数",
+  "register_limit_expire": "注册限制周期（分钟）",
+  "password_limit_enable": "启用密码错误限制",
+  "password_limit_count": "密码错误次数",
+  "password_limit_expire": "密码限制周期（分钟）"
+} %}
+<div class="card">
+  <div class="card-header">
+    <ul class="nav nav-tabs card-header-tabs">
+      {% for group_key in config.keys() %}
+      <li class="nav-item">
+        <button class="nav-link {% if group_key == active_group %}active{% endif %}" type="button" hx-get="/admin/fragments/settings/groups?active_group={{ group_key }}" hx-target="#settings-groups" hx-swap="innerHTML">
+          {{ labels.get(group_key, group_key) }}
+        </button>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <form hx-post="/admin/actions/settings/groups/{{ active_group }}" hx-target="#settings-groups" hx-swap="innerHTML">
+    <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+    <div class="card-body">
+      <div class="row g-3">
+        {% for key, value in config[active_group].items() %}
+        {% set is_json = value is mapping or (value is sequence and value is not string) %}
+        {% set type_hint = "json" if is_json else ("int" if value is number else "str") %}
+        <div class="col-md-6">
+          <label class="form-label">{{ field_labels.get(key, "配置项") }}</label>
+          <input type="hidden" name="_type_{{ key }}" value="{{ type_hint }}">
+          {% if is_json %}
+          <textarea class="form-control" rows="3" name="{{ key }}">{{ value | tojson }}</textarea>
+          {% else %}
+          <input class="form-control" name="{{ key }}" value="{{ '' if value is none else value }}">
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card-footer d-flex">
+      <button class="btn btn-primary" type="submit">保存 {{ labels.get(active_group, active_group) }}</button>
+      <div class="ms-auto btn-list">
+        {% if active_group == "email" %}
+        <button class="btn btn-outline-secondary" type="button" hx-post="/admin/actions/settings/mail/test" hx-include="closest form" hx-target="#modal-root" hx-swap="innerHTML">发送测试邮件</button>
+        {% endif %}
+        {% if active_group == "telegram" %}
+        <button class="btn btn-outline-secondary" type="button" hx-post="/admin/actions/settings/telegram/webhook" hx-include="closest form" hx-target="#modal-root" hx-swap="innerHTML">设置 Webhook</button>
+        {% endif %}
+      </div>
+    </div>
+  </form>
+</div>

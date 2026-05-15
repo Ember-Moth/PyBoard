@@ -1,0 +1,268 @@
+{% macro uri(user, server) -%}
+{%- if server.protocol == "shadowsocks" -%}
+ss://{{ server.ss_auth }}@{{ server.formatted_host }}:{{ server.port }}{% if server.ss_plugin %}?{{ {"plugin": server.ss_plugin} | query }}{% endif %}#{{ server.name | urlencode }}
+{%- elif server.protocol == "vmess" -%}
+{%- set cfg = {
+  "v": "2", "ps": server.name, "add": server.host, "port": server.port|string,
+  "id": user.uuid, "aid": "0", "scy": "auto", "net": server.network,
+  "type": "none", "host": "", "path": "", "tls": "tls" if server.tls else "",
+  "fp": server.tls_settings.fingerprint | default("chrome", true)
+} -%}
+{%- if server.tls -%}
+{% do cfg.update({"allowInsecure": server.allow_insecure_int, "sni": server.sni}) %}
+{%- endif -%}
+{{ configure_vmess_network(cfg, server) }}vmess://{{ cfg | b64_json }}
+{%- elif server.protocol == "vless" -%}
+{%- set params = {
+  "type": server.network, "encryption": "none", "host": "", "path": "",
+  "headerType": "none", "quicSecurity": "none", "serviceName": "",
+  "security": "reality" if server.tls == 2 else ("tls" if server.tls else ""),
+  "flow": server.flow or "", "fp": server.tls_settings.fingerprint | default("chrome", true),
+  "insecure": server.allow_insecure_int
+} -%}
+{%- if server.tls %}{% do params.update({"sni": server.sni}) %}{% endif -%}
+{%- if server.tls == 2 %}{% do params.update({"pbk": server.tls_settings.public_key | default("", true), "sid": server.tls_settings.short_id | default("", true)}) %}{% endif -%}
+{%- if server.vless_encryption %}{% do params.update({"encryption": server.vless_encryption}) %}{% endif -%}
+{{ uri_transport_params(params, server) }}
+vless://{{ user.uuid }}@{{ server.formatted_host }}:{{ server.port }}?{{ params | query }}#{{ server.name | urlencode }}
+{%- elif server.protocol == "trojan" -%}
+{%- set params = {"allowInsecure": server.allow_insecure_int, "peer": server.sni, "sni": server.sni, "type": server.network} -%}
+{{ uri_transport_params(params, server) }}
+trojan://{{ user.uuid }}@{{ server.formatted_host }}:{{ server.port }}?{{ params | query }}#{{ server.name | urlencode }}
+{%- elif server.protocol in ["hysteria", "hysteria2"] -%}
+{%- if server.protocol == "hysteria2" -%}
+{%- set params = {"insecure": server.allow_insecure_int, "sni": server.sni} -%}
+{%- else -%}
+{%- set params = {"protocol": "udp", "auth": user.uuid, "insecure": server.allow_insecure_int, "peer": server.sni, "upmbps": server.down_mbps, "downmbps": server.up_mbps} -%}
+{%- endif -%}
+{%- if server.obfs and server.obfs_password %}{% do params.update({"obfs": server.obfs, "obfs-password": server.obfs_password}) %}{% endif -%}
+{%- if server.multi_port %}{% do params.update({"mport": server.port}) %}{% endif -%}
+{{ "hysteria2" if server.protocol == "hysteria2" else "hysteria" }}://{% if server.protocol == "hysteria2" %}{{ user.uuid }}@{% endif %}{{ server.formatted_host }}:{{ server.first_port }}/{% if server.protocol == "hysteria2" %}{% else %}{% endif %}?{{ params | query }}#{{ server.name | urlencode }}
+{%- elif server.protocol == "tuic" -%}
+{%- set params = {"sni": server.sni, "alpn": "h3", "congestion_control": server.congestion_control or "", "allow_insecure": server.allow_insecure_int, "disable_sni": server.disable_sni | int, "udp_relay_mode": server.udp_relay_mode or ""} -%}
+tuic://{{ user.uuid }}:{{ user.uuid }}@{{ server.formatted_host }}:{{ server.port }}?{{ params | query }}#{{ server.name | urlencode }}
+{%- elif server.protocol == "anytls" -%}
+{%- set params = {"type": server.network, "insecure": server.allow_insecure_int, "fp": server.tls_settings.fingerprint | default("chrome", true), "sni": server.sni} -%}
+{%- if server.tls == 2 %}{% do params.update({"security": "reality", "pbk": server.tls_settings.public_key | default("", true), "sid": server.tls_settings.short_id | default("", true)}) %}{% endif -%}
+{{ uri_transport_params(params, server) }}
+anytls://{{ user.uuid }}@{{ server.formatted_host }}:{{ server.port }}/?{{ params | query }}#{{ server.name | urlencode }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro clash_proxy(user, server) -%}
+{%- set proxy = {"name": server.name, "server": server.host, "port": server.first_port_int, "udp": true} -%}
+{%- if server.protocol == "shadowsocks" -%}
+{% do proxy.update({"type": "ss", "cipher": server.cipher, "password": server.ss_password}) %}
+{%- if server.ss_plugin -%}
+{% do proxy.update({"plugin": "obfs", "plugin-opts": {"mode": "http"}}) %}
+{%- endif -%}
+{%- elif server.protocol == "vmess" -%}
+{% do proxy.update({"type": "vmess", "uuid": user.uuid, "alterId": 0, "cipher": "auto"}) %}
+{{ clash_transport(proxy, server) }}{{ clash_tls(proxy, server) }}
+{%- elif server.protocol == "vless" -%}
+{% do proxy.update({"type": "vless", "uuid": user.uuid}) %}
+{%- if server.flow %}{% do proxy.update({"flow": server.flow}) %}{% endif -%}
+{%- if server.vless_encryption %}{% do proxy.update({"encryption": server.vless_encryption}) %}{% endif -%}
+{{ clash_transport(proxy, server) }}{{ clash_tls(proxy, server) }}
+{%- elif server.protocol == "trojan" -%}
+{% do proxy.update({"type": "trojan", "password": user.uuid, "sni": server.sni, "skip-cert-verify": server.allow_insecure}) %}
+{{ clash_transport(proxy, server) }}
+{%- elif server.protocol in ["hysteria", "hysteria2"] -%}
+{% do proxy.update({"type": "hysteria2" if server.protocol == "hysteria2" else "hysteria", "password": user.uuid, "auth": user.uuid, "sni": server.sni, "skip-cert-verify": server.allow_insecure}) %}
+{%- if server.multi_port %}{% do proxy.update({"ports": server.port, "mport": server.port}) %}{% endif -%}
+{%- if server.obfs %}{% do proxy.update({"obfs": server.obfs, "obfs-password": server.obfs_password}) %}{% endif -%}
+{%- elif server.protocol == "tuic" -%}
+{% do proxy.update({"type": "tuic", "uuid": user.uuid, "password": user.uuid, "alpn": ["h3"], "disable-sni": server.disable_sni, "reduce-rtt": server.zero_rtt_handshake, "udp-relay-mode": server.udp_relay_mode or "native", "congestion-controller": server.congestion_control or "cubic", "sni": server.sni, "skip-cert-verify": server.allow_insecure}) %}
+{%- elif server.protocol == "anytls" -%}
+{% do proxy.update({"type": "anytls", "password": user.uuid, "client-fingerprint": server.tls_settings.fingerprint | default("chrome", true), "sni": server.sni, "skip-cert-verify": server.allow_insecure}) %}
+{%- else -%}
+{%- set proxy = none -%}
+{%- endif -%}
+{%- if proxy %}{{ proxy | to_json }}{% endif -%}
+{%- endmacro %}
+
+{% macro singbox_outbound(user, server, old=false) -%}
+{%- set outbound = {"tag": server.name, "server": server.host, "server_port": server.first_port_int} -%}
+{%- if not old %}{% do outbound.update({"domain_resolver": "local"}) %}{% endif -%}
+{%- if server.protocol == "shadowsocks" -%}
+{% do outbound.update({"type": "shadowsocks", "method": server.cipher, "password": server.ss_password}) %}
+{%- elif server.protocol == "vmess" -%}
+{% do outbound.update({"type": "vmess", "uuid": user.uuid, "security": "auto", "alter_id": 0}) %}
+{{ singbox_tls(outbound, server) }}{{ singbox_transport(outbound, server) }}
+{%- elif server.protocol == "vless" -%}
+{% do outbound.update({"type": "vless", "uuid": user.uuid, "packet_encoding": "xudp"}) %}
+{%- if server.flow %}{% do outbound.update({"flow": server.flow}) %}{% endif -%}
+{{ singbox_tls(outbound, server) }}{{ singbox_transport(outbound, server) }}
+{%- elif server.protocol == "trojan" -%}
+{% do outbound.update({"type": "trojan", "password": user.uuid}) %}
+{{ singbox_tls(outbound, server, true) }}{{ singbox_transport(outbound, server) }}
+{%- elif server.protocol in ["hysteria", "hysteria2"] -%}
+{% do outbound.update({"type": "hysteria2" if server.protocol == "hysteria2" else "hysteria", "password": user.uuid, "up_mbps": server.up_mbps, "down_mbps": server.down_mbps}) %}
+{%- if server.protocol == "hysteria" %}{% do outbound.update({"auth_str": user.uuid}) %}{% endif -%}
+{%- if server.obfs and server.obfs_password %}{% do outbound.update({"obfs": {"type": server.obfs, "password": server.obfs_password}}) %}{% endif -%}
+{{ singbox_tls(outbound, server, true) }}
+{%- elif server.protocol == "tuic" -%}
+{% do outbound.update({"type": "tuic", "uuid": user.uuid, "password": user.uuid, "congestion_control": server.congestion_control or "cubic", "udp_relay_mode": server.udp_relay_mode or "native", "zero_rtt_handshake": server.zero_rtt_handshake}) %}
+{{ singbox_tls(outbound, server, true) }}
+{%- elif server.protocol == "anytls" -%}
+{% do outbound.update({"type": "anytls", "password": user.uuid}) %}
+{{ singbox_tls(outbound, server, true) }}
+{%- endif -%}
+{{ outbound | to_json }}
+{%- endmacro %}
+
+{% macro line(format, user, server) -%}
+{%- if format == "surge" -%}{{ surge_line(user, server) }}
+{%- elif format == "surfboard" -%}{{ surfboard_line(user, server) }}
+{%- elif format == "loon" -%}{{ loon_line(user, server) }}
+{%- elif format == "quantumultx" -%}{{ qx_line(user, server) }}
+{%- elif format == "shadowrocket" -%}{{ shadowrocket_line(user, server) }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro surge_line(user, server) -%}
+{%- if server.protocol == "shadowsocks" -%}
+{{ server.name }}=ss,{{ server.host }},{{ server.port }},encrypt-method={{ server.cipher }},password={{ server.ss_password }},fast-open=false,udp=true
+{%- elif server.protocol == "vmess" -%}
+{{ server.name }}=vmess,{{ server.host }},{{ server.port }},username={{ user.uuid }},vmess-aead=true,tfo=true,udp-relay=true{% if server.tls %},tls=true{% endif %}{% if server.sni %},sni={{ server.sni }}{% endif %}{{ ws_params(server) }}
+{%- elif server.protocol == "trojan" -%}
+{{ server.name }}=trojan,{{ server.host }},{{ server.port }},password={{ user.uuid }}{% if server.sni %},sni={{ server.sni }}{% endif %},tfo=true,udp-relay=true{{ ws_params(server) }}
+{%- elif server.protocol == "hysteria2" -%}
+{{ server.name }}=hysteria2,{{ server.host }},{{ server.first_port }},password={{ user.uuid }},download-bandwidth={{ server.up_mbps }}{% if server.sni %},sni={{ server.sni }}{% endif %},udp-relay=true
+{%- elif server.protocol == "anytls" -%}
+{{ server.name }}=anytls,{{ server.host }},{{ server.port }},password={{ user.uuid }},skip-cert-verify={{ server.allow_insecure | boolstr }}{% if server.sni %},sni={{ server.sni }}{% endif %},tfo=true
+{%- endif -%}
+{%- endmacro %}
+
+{% macro surfboard_line(user, server) -%}
+{%- if server.protocol == "shadowsocks" and server.sip008 -%}
+{{ server.name }}=ss,{{ server.host }},{{ server.port }},encrypt-method={{ server.cipher }},password={{ server.ss_password }},tfo=true,udp-relay=true
+{%- elif server.protocol in ["vmess", "trojan", "anytls"] -%}
+{{ surge_line(user, server) }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro loon_line(user, server) -%}
+{%- if server.protocol == "shadowsocks" -%}
+{{ server.name }}=Shadowsocks,{{ server.host }},{{ server.port }},{{ server.cipher }},{{ server.ss_password }},fast-open=false,udp=true
+{%- elif server.protocol == "vmess" -%}
+{{ server.name }}=vmess,{{ server.host }},{{ server.port }},auto,{{ user.uuid }},fast-open=false,udp=true,alterId=0{{ loon_transport(server) }}
+{%- elif server.protocol == "vless" and server.network in ["tcp", "ws"] -%}
+{{ server.name }}=vless,{{ server.host }},{{ server.port }},{{ user.uuid }},fast-open=false,udp=true,alterId=0{% if server.flow %},flow={{ server.flow }}{% endif %}{{ loon_transport(server) }}
+{%- elif server.protocol == "trojan" and server.network != "grpc" -%}
+{{ server.name }}=trojan,{{ server.host }},{{ server.port }},{{ user.uuid }}{% if server.sni %},tls-name={{ server.sni }}{% endif %},fast-open=false,udp=true{{ ws_params(server) }}
+{%- elif server.protocol == "hysteria2" -%}
+{{ server.name }}=hysteria2,{{ server.host }},{{ server.first_port }},password={{ user.uuid }},download-bandwidth={{ server.up_mbps }}{% if server.sni %},sni={{ server.sni }}{% endif %},udp=true{% if server.obfs_password %},salamander-password={{ server.obfs_password }}{% endif %}
+{%- elif server.protocol == "anytls" -%}
+{{ server.name }}=anytls,{{ server.host }},{{ server.port }},{{ user.uuid }},udp=true{% if server.sni %},sni={{ server.sni }}{% endif %},skip-cert-verify={{ server.allow_insecure | boolstr }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro qx_line(user, server) -%}
+{%- if server.network in ["grpc", "httpupgrade", "xhttp"] -%}
+{%- elif server.protocol == "shadowsocks" -%}
+shadowsocks={{ server.host }}:{{ server.port }},method={{ server.cipher }},password={{ server.ss_password }},fast-open=false,udp-relay=true,tag={{ server.name }}
+{%- elif server.protocol == "vmess" -%}
+vmess={{ server.host }}:{{ server.port }},method=chacha20-poly1305,password={{ user.uuid }},fast-open=true,udp-relay=true,tag={{ server.name }}{{ qx_tls_obfs(server) }}
+{%- elif server.protocol == "vless" and not server.vless_encryption -%}
+vless={{ server.host }}:{{ server.port }},method=none,password={{ user.uuid }},udp-relay=true,tag={{ server.name }},fast-open={{ (server.tls != 2) | boolstr }}{% if server.flow %},vless-flow={{ server.flow }}{% endif %}{{ qx_tls_obfs(server) }}
+{%- elif server.protocol == "trojan" -%}
+trojan={{ server.host }}:{{ server.port }},password={{ user.uuid }},fast-open=true,udp-relay=true,tag={{ server.name }}{{ qx_tls_obfs(server) }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro shadowrocket_line(user, server) -%}
+{%- if server.protocol == "vmess" -%}
+{%- set info = ("auto:" ~ user.uuid ~ "@" ~ server.host ~ ":" ~ server.port) | b64 -%}
+{%- set params = {"tfo": 1, "remark": server.name, "alterId": 0} -%}
+{%- if server.tls %}{% do params.update({"tls": 1, "allowInsecure": server.allow_insecure_int, "peer": server.sni}) %}{% endif -%}
+{%- if server.network == "ws" %}{% do params.update({"obfs": "websocket", "path": server.network_settings.path | default("", true), "obfsParam": server.network_settings.headers.Host | default("", true)}) %}{% endif -%}
+vmess://{{ info }}?{{ params | query }}
+{%- else -%}
+{{ uri(user, server) }}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro configure_vmess_network(cfg, server) -%}
+{%- if server.network == "tcp" and server.network_settings.header.type | default("") == "http" -%}
+{% do cfg.update({"type": "http", "host": server.network_settings.header.request.headers.Host[0] | default("", true), "path": server.network_settings.header.request.path[0] | default("", true)}) %}
+{%- elif server.network == "ws" -%}
+{% do cfg.update({"path": server.network_settings.path | default("", true), "host": server.network_settings.headers.Host | default("", true)}) %}
+{%- elif server.network == "grpc" -%}
+{% do cfg.update({"path": server.network_settings.serviceName | default("", true)}) %}
+{%- elif server.network == "kcp" -%}
+{% do cfg.update({"type": server.network_settings.header.type | default("none", true), "path": server.network_settings.seed | default("", true)}) %}
+{%- elif server.network in ["httpupgrade", "xhttp"] -%}
+{% do cfg.update({"path": server.network_settings.path | default("", true), "host": server.network_settings.host | default("", true)}) %}
+{%- if server.network == "xhttp" %}{% do cfg.update({"mode": server.network_settings.mode | default("auto", true)}) %}{% endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro clash_transport(proxy, server) -%}
+{%- if server.network == "ws" -%}
+{% do proxy.update({"network": "ws", "ws-opts": {"path": server.network_settings.path | default("/", true), "headers": {"Host": server.network_settings.headers.Host | default("", true)}}}) %}
+{%- elif server.network == "grpc" -%}
+{% do proxy.update({"network": "grpc", "grpc-opts": {"grpc-service-name": server.network_settings.serviceName | default("", true)}}) %}
+{%- elif server.network in ["httpupgrade", "xhttp"] -%}
+{% do proxy.update({"network": server.network}) %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro clash_tls(proxy, server) -%}
+{%- if server.tls -%}
+{% do proxy.update({"tls": true, "skip-cert-verify": server.allow_insecure, "servername": server.sni, "client-fingerprint": server.tls_settings.fingerprint | default("chrome", true)}) %}
+{%- if server.tls == 2 %}{% do proxy.update({"reality-opts": {"public-key": server.tls_settings.public_key | default("", true), "short-id": server.tls_settings.short_id | default("", true)}}) %}{% endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro singbox_tls(outbound, server, force=false) -%}
+{%- if force or server.tls -%}
+{%- set tls = {"enabled": true, "insecure": server.allow_insecure, "server_name": server.sni} -%}
+{%- if server.tls == 2 %}{% do tls.update({"reality": {"enabled": true, "public_key": server.tls_settings.public_key | default("", true), "short_id": server.tls_settings.short_id | default("", true)}}) %}{% endif -%}
+{%- if server.tls_settings.fingerprint is defined %}{% do tls.update({"utls": {"enabled": true, "fingerprint": server.tls_settings.fingerprint}}) %}{% endif -%}
+{% do outbound.update({"tls": tls}) %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro singbox_transport(outbound, server) -%}
+{%- if server.network == "ws" -%}
+{% do outbound.update({"transport": {"type": "ws", "path": server.network_settings.path | default("/", true), "headers": {"Host": [server.network_settings.headers.Host | default("", true)]}, "max_early_data": 2048, "early_data_header_name": "Sec-WebSocket-Protocol"}}) %}
+{%- elif server.network == "grpc" -%}
+{% do outbound.update({"transport": {"type": "grpc", "service_name": server.network_settings.serviceName | default("", true)}}) %}
+{%- elif server.network in ["httpupgrade", "xhttp"] -%}
+{% do outbound.update({"transport": {"type": server.network, "path": server.network_settings.path | default("/", true), "host": server.network_settings.host | default("", true), "mode": server.network_settings.mode | default("auto", true)}}) %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro uri_transport_params(params, server) -%}
+{%- if server.network == "ws" -%}
+{% do params.update({"path": server.network_settings.path | default("", true), "host": server.network_settings.headers.Host | default("", true)}) %}
+{%- elif server.network == "grpc" -%}
+{% do params.update({"serviceName": server.network_settings.serviceName | default("", true)}) %}
+{%- elif server.network == "kcp" -%}
+{% do params.update({"headerType": server.network_settings.header.type | default("none", true), "seed": server.network_settings.seed | default("", true)}) %}
+{%- elif server.network in ["httpupgrade", "xhttp"] -%}
+{% do params.update({"path": server.network_settings.path | default("", true), "host": server.network_settings.host | default("", true)}) %}
+{%- if server.network == "xhttp" %}{% do params.update({"mode": server.network_settings.mode | default("auto", true)}) %}{% endif -%}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro ws_params(server) -%}
+{%- if server.network == "ws" -%}
+,ws=true{% if server.network_settings.path is defined %},ws-path={{ server.network_settings.path }}{% endif %}{% if server.network_settings.headers.Host is defined %},ws-headers=Host:{{ server.network_settings.headers.Host }}{% endif %}
+{%- endif -%}
+{%- endmacro %}
+
+{% macro loon_transport(server) -%}
+{%- if server.network == "tcp" -%},transport=tcp{% elif server.network == "ws" -%},transport=ws{% if server.network_settings.path is defined %},path={{ server.network_settings.path }}{% endif %}{% if server.network_settings.headers.Host is defined %},host={{ server.network_settings.headers.Host }}{% endif %}{% endif -%}
+{%- if server.tls == 1 -%},over-tls=true{% elif server.tls == 2 -%}{% if server.tls_settings.public_key is defined %},public-key={{ server.tls_settings.public_key }}{% endif %}{% if server.tls_settings.short_id is defined %},short-id={{ server.tls_settings.short_id }}{% endif %}{% endif -%}
+{%- if server.sni %},tls-name={{ server.sni }}{% endif -%}
+{%- if server.allow_insecure %},skip-cert-verify=true{% endif -%}
+{%- endmacro %}
+
+{% macro qx_tls_obfs(server) -%}
+{%- if server.tls %},tls13=true{% if server.allow_insecure %},tls-verification=false{% endif %}{% endif -%}
+{%- if server.network == "ws" -%},obfs={{ "wss" if server.tls else "ws" }}{% if server.sni %},obfs-host={{ server.sni }}{% endif %}{% if server.network_settings.path is defined %},obfs-uri={{ server.network_settings.path }}{% endif %}
+{%- elif server.network == "tcp" and server.tls -%},obfs=over-tls{% if server.sni %},obfs-host={{ server.sni }}{% endif %}
+{%- endif -%}
+{%- endmacro %}

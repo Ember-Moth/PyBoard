@@ -1,0 +1,73 @@
+{% set customer_nav = ["users", "invite", "tickets"] %}
+{% set content_nav = ["notices", "knowledge"] %}
+{% set commerce_nav = ["plans", "orders", "payments", "coupons", "giftcards"] %}
+{% set infra_nav = ["servers"] %}
+{% set system_nav = ["settings", "stats", "system", "logs", "failed_jobs", "mail", "themes"] %}
+<header class="navbar-expand-md" data-bs-theme="dark">
+  <div class="collapse navbar-collapse" id="navbar-menu">
+    <div class="navbar">
+      <div class="container-xl">
+        <ul class="navbar-nav">
+          <li class="nav-item {% if active == 'dashboard' %}active{% endif %}">
+            <a class="nav-link" href="/admin/dashboard">
+              <span class="nav-link-title">仪表盘</span>
+            </a>
+          </li>
+          <li class="nav-item dropdown {% if active in customer_nav %}active{% endif %}">
+            <a class="nav-link dropdown-toggle" href="#navbar-customer" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+              <span class="nav-link-title">客户与支持</span>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if active == 'users' %}active{% endif %}" href="/admin/users">用户账户</a>
+              <a class="dropdown-item {% if active == 'invite' %}active{% endif %}" href="/admin/invite">邀请与佣金</a>
+              <a class="dropdown-item {% if active == 'tickets' %}active{% endif %}" href="/admin/tickets">客户工单</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown {% if active in content_nav %}active{% endif %}">
+            <a class="nav-link dropdown-toggle" href="#navbar-content" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+              <span class="nav-link-title">内容运营</span>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if active == 'notices' %}active{% endif %}" href="/admin/notices">站内公告</a>
+              <a class="dropdown-item {% if active == 'knowledge' %}active{% endif %}" href="/admin/knowledge">帮助文档</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown {% if active in commerce_nav %}active{% endif %}">
+            <a class="nav-link dropdown-toggle" href="#navbar-commerce" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+              <span class="nav-link-title">销售与支付</span>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if active == 'plans' %}active{% endif %}" href="/admin/plans">销售套餐</a>
+              <a class="dropdown-item {% if active == 'orders' %}active{% endif %}" href="/admin/orders">订单流水</a>
+              <a class="dropdown-item {% if active == 'payments' %}active{% endif %}" href="/admin/payments">收款渠道</a>
+              <a class="dropdown-item {% if active == 'coupons' %}active{% endif %}" href="/admin/coupons">优惠券</a>
+              <a class="dropdown-item {% if active == 'giftcards' %}active{% endif %}" href="/admin/giftcards">礼品卡</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown {% if active in infra_nav %}active{% endif %}">
+            <a class="nav-link dropdown-toggle" href="#navbar-infra" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+              <span class="nav-link-title">节点网络</span>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if active == 'servers' %}active{% endif %}" href="/admin/servers">节点、分组与路由</a>
+            </div>
+          </li>
+          <li class="nav-item dropdown {% if active in system_nav %}active{% endif %}">
+            <a class="nav-link dropdown-toggle" href="#navbar-system" data-bs-toggle="dropdown" data-bs-auto-close="outside" role="button" aria-expanded="false">
+              <span class="nav-link-title">系统运维</span>
+            </a>
+            <div class="dropdown-menu">
+              <a class="dropdown-item {% if active == 'settings' %}active{% endif %}" href="/admin/settings">站点设置</a>
+              <a class="dropdown-item {% if active == 'stats' %}active{% endif %}" href="/admin/stats">业务统计</a>
+              <a class="dropdown-item {% if active == 'system' %}active{% endif %}" href="/admin/system">运行状态</a>
+              <a class="dropdown-item {% if active == 'logs' %}active{% endif %}" href="/admin/logs">系统事件</a>
+              <a class="dropdown-item {% if active == 'failed_jobs' %}active{% endif %}" href="/admin/failed-jobs">失败队列</a>
+              <a class="dropdown-item {% if active == 'mail' %}active{% endif %}" href="/admin/mail">邮件投递</a>
+              <a class="dropdown-item {% if active == 'themes' %}active{% endif %}" href="/admin/themes">主题外观</a>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>

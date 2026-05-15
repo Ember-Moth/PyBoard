@@ -1,0 +1,33 @@
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header"><div class="card-title">运行环境</div></div>
+      <div class="card-body">
+        <dl class="row mb-0">
+          <dt class="col-4">时间戳</dt><dd class="col-8">{{ status.time }}</dd>
+          <dt class="col-4">Python</dt><dd class="col-8">{{ status.python }}</dd>
+          <dt class="col-4">平台</dt><dd class="col-8">{{ status.platform }}</dd>
+          <dt class="col-4">磁盘</dt><dd class="col-8">{{ status.disk.used }} / {{ status.disk.total }}</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card">
+      <div class="card-header"><div class="card-title">队列状态</div></div>
+      <div class="table-responsive">
+        <table class="table card-table table-vcenter">
+          <thead><tr><th>队列</th><th>任务数</th></tr></thead>
+          <tbody>
+            {% for item in workload %}
+            <tr><td><code>{{ item.name }}</code></td><td>{{ item.jobs }}</td></tr>
+            {% else %}
+            <tr><td colspan="2" class="text-center text-secondary py-4">暂无队列</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <div class="card-footer text-secondary">失败任务：{{ queue.failed_jobs }}</div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+{% macro state_inputs() -%}
+<input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+<input type="hidden" name="q" value="{{ q }}">
+<input type="hidden" name="status" value="{{ status }}">
+<input type="hidden" name="offset" value="{{ offset }}">
+<input type="hidden" name="limit" value="{{ limit }}">
+{%- endmacro %}
+{% set prev_offset = [offset - limit, 0] | max %}
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">用户列表</div>
+    <div class="ms-auto text-secondary">
+      {% if q or status %}
+      已筛选
+      {% else %}
+      全部用户
+      {% endif %}
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>邮箱</th>
+          <th>角色</th>
+          <th>套餐</th>
+          <th>状态</th>
+          <th>创建时间</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+        <tr>
+          <td>{{ user.id }}</td>
+          <td>{{ user.email }}</td>
+          <td>
+            {% if user.is_admin %}<span class="badge bg-purple-lt">Admin</span>{% endif %}
+            {% if user.is_staff %}<span class="badge bg-blue-lt">Staff</span>{% endif %}
+            {% if not user.is_admin and not user.is_staff %}<span class="text-secondary">普通</span>{% endif %}
+          </td>
+          <td>{{ user.plan_id or '-' }}</td>
+          <td>
+            {% if user.banned %}
+            <span class="badge bg-red-lt">已封禁</span>
+            {% else %}
+            <span class="badge bg-green-lt">正常</span>
+            {% endif %}
+          </td>
+          <td>{{ user.created_at }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button
+                class="btn btn-sm"
+                type="button"
+                hx-get="/admin/fragments/users/form?user_id={{ user.id }}&q={{ q | urlencode }}&status={{ status | urlencode }}&offset={{ offset }}&limit={{ limit }}"
+                hx-target="#modal-root"
+                hx-swap="innerHTML">
+                编辑
+              </button>
+              <form hx-post="/admin/actions/users/{{ user.id }}/ban" hx-target="#users-table" hx-swap="innerHTML">
+                {{ state_inputs() }}
+                <input type="hidden" name="banned" value="{{ 0 if user.banned else 1 }}">
+                <button class="btn btn-sm {% if user.banned %}btn-outline-success{% else %}btn-outline-danger{% endif %}" type="submit">
+                  {% if user.banned %}解封{% else %}封禁{% endif %}
+                </button>
+              </form>
+              <form
+                hx-post="/admin/actions/users/{{ user.id }}/reset-security"
+                hx-target="#users-table"
+                hx-swap="innerHTML"
+                hx-confirm="确认重置该用户的 UUID 和订阅 token？">
+                {{ state_inputs() }}
+                <button class="btn btn-sm btn-outline-warning" type="submit">重置安全</button>
+              </form>
+              <form
+                hx-post="/admin/actions/users/{{ user.id }}/delete"
+                hx-target="#users-table"
+                hx-swap="innerHTML"
+                hx-confirm="确认删除该用户？相关订单和工单也会被清理。">
+                {{ state_inputs() }}
+                <button class="btn btn-sm btn-outline-danger" type="submit">删除</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-secondary py-4">暂无用户</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex align-items-center">
+    <div class="text-secondary">从第 {{ offset + 1 }} 条开始，最多显示 {{ limit }} 条</div>
+    <div class="ms-auto btn-list">
+      {% if offset > 0 %}
+      <button
+        class="btn"
+        hx-get="/admin/fragments/users/table?offset={{ prev_offset }}&limit={{ limit }}&q={{ q | urlencode }}&status={{ status | urlencode }}"
+        hx-target="#users-table"
+        hx-swap="innerHTML">
+        上一页
+      </button>
+      {% endif %}
+      {% if users | length == limit %}
+      <button
+        class="btn"
+        hx-get="/admin/fragments/users/table?offset={{ offset + limit }}&limit={{ limit }}&q={{ q | urlencode }}&status={{ status | urlencode }}"
+        hx-target="#users-table"
+        hx-swap="innerHTML">
+        下一页
+      </button>
+      {% endif %}
+    </div>
+  </div>
+</div>

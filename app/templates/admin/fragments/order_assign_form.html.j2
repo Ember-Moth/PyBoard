@@ -1,0 +1,47 @@
+<div class="modal modal-blur d-block" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form hx-post="/admin/actions/orders/assign" hx-target="#modal-root" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+        <div class="modal-header">
+          <h5 class="modal-title">分配订单</h5>
+          <button type="button" class="btn-close" onclick="document.getElementById('modal-root').innerHTML=''"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label">用户邮箱</label>
+              <input name="email" type="email" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">分配套餐</label>
+              <input name="plan_id" type="number" min="1" class="form-control" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">周期</label>
+              <select name="period" class="form-select" required>
+                <option value="month_price">月付</option>
+                <option value="quarter_price">季付</option>
+                <option value="half_year_price">半年付</option>
+                <option value="year_price">年付</option>
+                <option value="two_year_price">两年付</option>
+                <option value="three_year_price">三年付</option>
+                <option value="onetime_price">一次性</option>
+                <option value="reset_price">重置流量</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <label class="form-label">订单金额（分）</label>
+              <input name="total_amount" type="number" min="0" class="form-control" value="0">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn" onclick="document.getElementById('modal-root').innerHTML=''">取消</button>
+          <button type="submit" class="btn btn-primary">分配</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="modal-backdrop fade show"></div>

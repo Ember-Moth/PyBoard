@@ -1,0 +1,85 @@
+<div class="card">
+  <div class="card-header">
+    <form class="row g-2 w-100" hx-get="/admin/fragments/tickets/table" hx-target="#tickets-table" hx-swap="innerHTML">
+      <div class="col-md-3">
+        <input name="email" class="form-control" placeholder="用户邮箱" value="{{ email }}">
+      </div>
+      <div class="col-md-2">
+        <select name="status" class="form-select">
+          <option value="">全部状态</option>
+          <option value="0" {% if status == 0 %}selected{% endif %}>处理中</option>
+          <option value="1" {% if status == 1 %}selected{% endif %}>已关闭</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select name="reply_status" class="form-select">
+          <option value="">全部回复</option>
+          <option value="0" {% if reply_status == 0 %}selected{% endif %}>待客服</option>
+          <option value="1" {% if reply_status == 1 %}selected{% endif %}>已回复</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <button class="btn btn-primary" type="submit">筛选</button>
+      </div>
+      <div class="col text-end text-secondary align-self-center">共 {{ total }} 条</div>
+    </form>
+  </div>
+  <div class="table-responsive">
+    <table class="table table-vcenter card-table table-striped">
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>用户</th>
+          <th>工单主题</th>
+          <th>紧急程度</th>
+          <th>状态</th>
+          <th>回复</th>
+          <th>创建时间</th>
+          <th class="w-1"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for ticket in tickets %}
+        <tr>
+          <td>{{ ticket.id }}</td>
+          <td>{{ ticket.user_id }}</td>
+          <td>{{ ticket.subject }}</td>
+          <td>{{ ticket.level }}</td>
+          <td>{% if ticket.status == 0 %}<span class="badge bg-blue-lt">处理中</span>{% else %}<span class="badge bg-secondary-lt">已关闭</span>{% endif %}</td>
+          <td>{% if ticket.reply_status == 0 %}<span class="badge bg-yellow-lt">待客服</span>{% else %}<span class="badge bg-green-lt">已回复</span>{% endif %}</td>
+          <td>{{ ticket.created_at }}</td>
+          <td>
+            <div class="btn-list flex-nowrap">
+              <button class="btn btn-sm" type="button" hx-get="/admin/fragments/tickets/detail?ticket_id={{ ticket.id }}" hx-target="#modal-root" hx-swap="innerHTML">详情</button>
+              {% if ticket.status == 0 %}
+              <form hx-post="/admin/actions/tickets/{{ ticket.id }}/close" hx-target="#tickets-table" hx-swap="innerHTML">
+                <input type="hidden" name="csrf_token" value="{{ request.cookies.get('admin_csrf') }}">
+                <input type="hidden" name="page_no" value="{{ page_no }}">
+                <input type="hidden" name="size" value="{{ size }}">
+                <input type="hidden" name="status" value="{{ status }}">
+                <input type="hidden" name="reply_status" value="{{ reply_status }}">
+                <input type="hidden" name="email" value="{{ email }}">
+                <button class="btn btn-sm btn-outline-secondary" type="submit">关闭</button>
+              </form>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="8" class="text-center text-secondary py-4">暂无工单</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="card-footer d-flex">
+    <div class="text-secondary">第 {{ page_no }} 页 / 每页 {{ size }}</div>
+    <div class="ms-auto btn-list">
+      {% if page_no > 1 %}
+      <button class="btn" hx-get="/admin/fragments/tickets/table?page_no={{ page_no - 1 }}&size={{ size }}&status={{ status }}&reply_status={{ reply_status }}&email={{ email }}" hx-target="#tickets-table">上一页</button>
+      {% endif %}
+      {% if tickets | length == size %}
+      <button class="btn" hx-get="/admin/fragments/tickets/table?page_no={{ page_no + 1 }}&size={{ size }}&status={{ status }}&reply_status={{ reply_status }}&email={{ email }}" hx-target="#tickets-table">下一页</button>
+      {% endif %}
+    </div>
+  </div>
+</div>
