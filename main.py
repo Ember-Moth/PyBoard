@@ -19,7 +19,6 @@ from app.controllers.admin import server as admin_server
 from app.controllers.admin import setting as admin_setting
 from app.controllers.admin import stat as admin_stat
 from app.controllers.admin import system as admin_system
-from app.controllers.admin import theme as admin_theme
 from app.controllers.admin import ticket as admin_ticket
 from app.core.database import close_db, init_db
 from app.core.error_handlers import (
@@ -77,7 +76,6 @@ app.include_router(admin_payment.router)
 app.include_router(admin_server.router)
 app.include_router(admin_stat.router)
 app.include_router(admin_system.router)
-app.include_router(admin_theme.router)
 app.include_router(admin_coupon.router)
 app.include_router(admin_giftcard.router)
 app.include_router(admin_ticket.router)

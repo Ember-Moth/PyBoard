@@ -72,15 +72,6 @@ async def list_email_templates():
     return success(data=files)
 
 
-@router.get("/templates/theme", response_model=ApiResponse[list[str]])
-async def list_theme_templates():
-    """获取本地主题目录列表。"""
-    path = Path("public/theme")
-    if not path.exists():
-        return success(data=[])
-    return success(data=sorted(item.name for item in path.iterdir() if item.is_dir()))
-
-
 @router.post("/mail/test", response_model=ApiResponse[bool])
 async def test_send_mail(
     current_user: UserRead = Depends(get_current_admin),

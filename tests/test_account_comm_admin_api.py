@@ -157,19 +157,10 @@ async def test_admin_order_assign_paid_cancel_and_update(admin_client):
 
 
 @pytest.mark.asyncio
-async def test_admin_setting_templates_and_themes(admin_client):
+async def test_admin_setting_templates(admin_client):
     res = await admin_client.get("/api/v1/admin/settings/templates/email")
     assert res.status_code == 200
     assert "mail_verify.html" in res.json()["data"]
-
-    res = await admin_client.get("/api/v1/admin/settings/templates/theme")
-    assert res.status_code == 200
-    assert isinstance(res.json()["data"], list)
-
-    res = await admin_client.get("/api/v1/admin/themes")
-    assert res.status_code == 200
-    assert "themes" in res.json()["data"]
-
 
 @pytest.mark.asyncio
 async def test_staff_routes_require_staff_role(client, engine):

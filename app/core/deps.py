@@ -53,7 +53,6 @@ from app.services.system import SystemService
 from app.services.subscribe import SubscribeService
 from app.services.telegram import TelegramService
 from app.services.ticket import TicketService
-from app.services.theme import ThemeService
 from app.services.turnstile import TurnstileService
 from app.services.user import UserService
 
@@ -353,10 +352,6 @@ def get_stat_service(db: AsyncSession = DbDep) -> StatService:
 
 def get_system_service(db: AsyncSession = DbDep) -> SystemService:
     return SystemService(db)
-
-
-def get_theme_service(setting_service: SettingService = Depends(get_setting_service)) -> ThemeService:
-    return ThemeService(setting_service)
 
 
 def get_telegram_service(

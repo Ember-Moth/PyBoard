@@ -70,13 +70,6 @@ DEFAULT_SETTING_GROUPS: dict[str, tuple[SettingDefault, ...]] = {
         SettingDefault("show_subscribe_method", 0, "int", "订阅展示方式"),
         SettingDefault("show_subscribe_expire", 5, "int", "订阅过期提醒天数"),
     ),
-    "frontend": (
-        SettingDefault("frontend_theme", "pyboard", "str", "当前主题"),
-        SettingDefault("frontend_theme_sidebar", "light", "str", "侧栏样式"),
-        SettingDefault("frontend_theme_header", "dark", "str", "页头样式"),
-        SettingDefault("frontend_theme_color", "default", "str", "主题色"),
-        SettingDefault("frontend_background_url", "", "str", "背景图地址"),
-    ),
     "server": (
         SettingDefault("server_api_url", "", "str", "节点 API 地址"),
         SettingDefault("server_token", "", "str", "节点通信密钥"),

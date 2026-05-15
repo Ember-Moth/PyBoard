@@ -1,8 +1,6 @@
 """Admin 运维类 HTML 路由。"""
 
 from pathlib import Path
-from typing import Any
-
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from pydantic import ValidationError
@@ -27,7 +25,6 @@ from app.core.deps import (
     get_log_service,
     get_mail_service,
     get_system_service,
-    get_theme_service,
 )
 from app.core.queue import PostgresQueue
 from app.core.exceptions import AppException
@@ -36,7 +33,6 @@ from app.services.admin_tools import FailedJobService, LogService
 from app.services.auth import AuthService
 from app.services.mail import MailService
 from app.services.system import SystemService
-from app.services.theme import ThemeService
 
 router = APIRouter()
 
@@ -316,73 +312,6 @@ async def send_mail_action(
     return response
 
 
-@router.get("/themes", response_class=HTMLResponse, include_in_schema=False)
-async def themes_page(request: Request, auth: AuthService = Depends(get_auth_service)):
-    admin = await current_admin(request, auth)
-    if admin is None:
-        return redirect_to_login(request)
-    return page("admin/pages/themes.html.j2", request, admin, "themes", "主题管理")
-
-
-@router.get("/fragments/themes/table", response_class=HTMLResponse, include_in_schema=False)
-async def themes_table(
-    request: Request,
-    auth: AuthService = Depends(get_auth_service),
-    theme_service: ThemeService = Depends(get_theme_service),
-):
-    admin = await current_admin(request, auth)
-    if admin is None:
-        return unauthorized_fragment()
-    return await themes_table_response(request, admin, theme_service)
-
-
-@router.get("/fragments/themes/config-form", response_class=HTMLResponse, include_in_schema=False)
-async def theme_config_form(
-    request: Request,
-    name: str,
-    auth: AuthService = Depends(get_auth_service),
-    theme_service: ThemeService = Depends(get_theme_service),
-):
-    admin = await current_admin(request, auth)
-    if admin is None:
-        return unauthorized_fragment()
-    themes = await theme_service.list_themes()
-    theme = themes.get("themes", {}).get(name)
-    if theme is None:
-        return action_error(request, "主题不存在")
-    config = await theme_service.get_theme_config(name)
-    return template(
-        "admin/fragments/theme_config_form.html.j2",
-        request,
-        {"admin": admin, "name": name, "theme": theme, "config": config},
-    )
-
-
-@router.post("/actions/themes/{name}/config", response_class=HTMLResponse, include_in_schema=False)
-async def save_theme_config_action(
-    name: str,
-    request: Request,
-    auth: AuthService = Depends(get_auth_service),
-    theme_service: ThemeService = Depends(get_theme_service),
-):
-    admin = await current_admin(request, auth)
-    if admin is None:
-        return unauthorized_fragment()
-    form = await form_data(request)
-    if not valid_csrf(request, form):
-        return action_error(request, "CSRF 校验失败")
-    payload: dict[str, Any] = {key: value for key, value in form.items() if key != "csrf_token"}
-    try:
-        await theme_service.save_theme_config(name, payload)
-    except AppException as exc:
-        return action_error(request, exc.detail)
-    response = await themes_table_response(request, admin, theme_service)
-    response.headers["HX-Trigger"] = "admin:close-modal"
-    response.headers["HX-Retarget"] = "#themes-table"
-    response.headers["HX-Reswap"] = "innerHTML"
-    return response
-
-
 async def logs_table_response(
     request: Request,
     admin: UserRead,
@@ -449,14 +378,6 @@ async def mail_logs_response(
         "admin/fragments/mail_logs_table.html.j2",
         request,
         {"admin": admin, "logs": await mail_service.list_logs(offset, limit), "offset": offset, "limit": limit},
-    )
-
-
-async def themes_table_response(request: Request, admin: UserRead, theme_service: ThemeService):
-    return template(
-        "admin/fragments/themes_table.html.j2",
-        request,
-        {"admin": admin, "themes": await theme_service.list_themes()},
     )
 
 

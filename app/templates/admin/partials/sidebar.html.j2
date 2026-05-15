@@ -2,7 +2,7 @@
 {% set content_nav = ["notices", "knowledge"] %}
 {% set commerce_nav = ["plans", "orders", "payments", "coupons", "giftcards"] %}
 {% set infra_nav = ["servers"] %}
-{% set system_nav = ["settings", "system", "logs", "failed_jobs", "mail", "themes"] %}
+{% set system_nav = ["settings", "system", "logs", "failed_jobs", "mail"] %}
 <header class="navbar-expand-md" data-bs-theme="dark">
   <div class="collapse navbar-collapse" id="navbar-menu">
     <div class="navbar">
@@ -62,7 +62,6 @@
               <a class="dropdown-item {% if active == 'logs' %}active{% endif %}" href="/admin/logs">系统事件</a>
               <a class="dropdown-item {% if active == 'failed_jobs' %}active{% endif %}" href="/admin/failed-jobs">失败队列</a>
               <a class="dropdown-item {% if active == 'mail' %}active{% endif %}" href="/admin/mail">邮件投递</a>
-              <a class="dropdown-item {% if active == 'themes' %}active{% endif %}" href="/admin/themes">主题外观</a>
             </div>
           </li>
         </ul>

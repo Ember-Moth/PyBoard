@@ -806,7 +806,7 @@ async def test_admin_ui_ops_pages_flow(client, engine):
     csrf = await _login_admin_ui(client, engine, "ops-admin-ui@test.local")
     await _seed_failed_job(engine)
 
-    for path in ["/admin/dashboard", "/admin/system", "/admin/logs", "/admin/failed-jobs", "/admin/mail", "/admin/themes"]:
+    for path in ["/admin/dashboard", "/admin/system", "/admin/logs", "/admin/failed-jobs", "/admin/mail"]:
         res = await client.get(path)
         assert res.status_code == 200
 
@@ -856,9 +856,6 @@ async def test_admin_ui_ops_pages_flow(client, engine):
     assert res.status_code == 200
     assert "ops-target@test.local" in res.text
 
-    res = await client.get("/admin/fragments/themes/table")
-    assert res.status_code == 200
-    assert "主题列表" in res.text
 
 
 async def _promote_admin(engine, email: str) -> None:

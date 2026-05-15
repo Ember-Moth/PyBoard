@@ -102,8 +102,8 @@ class SettingService:
     async def fetch_config(self, group_key: str | None = None) -> dict:
         """按后台配置分组结构获取配置。
 
-        支持的分组：ticket, deposit, invite, site, subscribe, frontend,
-        server, email, telegram, app, safe
+        支持的分组：ticket, deposit, invite, site, subscribe, server,
+        email, telegram, app, safe
         """
         selected_groups = (
             {group_key: DEFAULT_SETTING_GROUPS[group_key]}
