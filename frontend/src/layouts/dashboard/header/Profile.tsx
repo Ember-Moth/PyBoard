@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { clearAuthToken } from "@/lib/auth";
+import { navigateSpa } from "@/lib/spa-navigation";
 
 const Profile = () => {
   const router = useRouter();
@@ -13,6 +14,11 @@ const Profile = () => {
     clearAuthToken();
     setAnchorEl(null);
     router.replace("/auth/login");
+  };
+
+  const openSettings = () => {
+    setAnchorEl(null);
+    navigateSpa("/settings");
   };
 
   return (
@@ -36,13 +42,13 @@ const Profile = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         sx={{ "& .MuiMenu-paper": { width: "200px" } }}
       >
-        <MenuItem onClick={() => router.push("/settings")}>
+        <MenuItem onClick={openSettings}>
           <ListItemIcon>
             <IconUser width={20} />
           </ListItemIcon>
           <ListItemText>账户资料</ListItemText>
         </MenuItem>
-        <MenuItem onClick={() => router.push("/settings")}>
+        <MenuItem onClick={openSettings}>
           <ListItemIcon>
             <IconSettings width={20} />
           </ListItemIcon>

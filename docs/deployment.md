@@ -6,6 +6,7 @@
 
 - Python >= 3.14
 - uv
+- Node.js 与 pnpm，仅用于构建用户端前端；如果使用 fnm 管理 Node，构建前先加载 fnm 环境
 - PostgreSQL 18
 - 可选：pg_cron，用于数据库内定时任务调度
 - 反向代理：Nginx、Caddy 或同类网关
@@ -14,11 +15,13 @@
 
 ## 组件说明
 
-生产环境建议至少运行两个进程：
+生产环境建议使用以下组件：
 
 ```text
+Frontend SPA:       Nginx 静态托管 frontend/out
 Web API/Admin HTML: uvicorn main:app
 Queue Worker:       python -m app.queues.worker
+Database:           PostgreSQL
 ```
 
 PostgreSQL 承载：
@@ -287,6 +290,84 @@ uv run python -m app.queues.worker --queue traffic_fetch --queue stat
 
 建议使用 systemd、supervisor、Docker Compose 或同类进程管理工具分别托管 Web 和 Worker。
 
+Worker 是常驻进程。前台运行时按 `Ctrl+C` 出现 `KeyboardInterrupt` 属于手动停止，不是队列异常。生产环境应交给 systemd 或同类进程管理工具运行。
+
+## 用户端前端构建与导出
+
+用户端前端推荐使用静态导出部署，由 Nginx 托管 `frontend/out`。后端 API、Admin HTML 和支付回调由 Nginx 反代到 FastAPI。
+
+进入前端目录：
+
+```bash
+cd /opt/PyBoard/frontend
+```
+
+如果 Node.js 由 fnm 管理，先加载当前 shell 的 Node 环境：
+
+```bash
+eval "$(fnm env --use-on-cd)"
+```
+
+安装依赖：
+
+```bash
+pnpm install
+```
+
+静态导出构建：
+
+```bash
+NEXT_OUTPUT=export pnpm run build
+```
+
+输出目录：
+
+```text
+/opt/PyBoard/frontend/out
+```
+
+Windows PowerShell 构建命令：
+
+```powershell
+cd frontend
+fnm env --use-on-cd | Out-String | Invoke-Expression
+$env:NEXT_OUTPUT = "export"
+pnpm run build
+```
+
+### 前端运行时配置
+
+前端会读取 `/config.json`。静态导出后对应文件是：
+
+```text
+frontend/out/config.json
+```
+
+同域部署时，`apiBaseUrl` 留空，请求会走当前域名下的 `/api`，由 Nginx 反代到后端：
+
+```json
+{
+  "apiBaseUrl": "",
+  "footer": {
+    "description": "",
+    "copyright": "",
+    "seoKeywords": ["VPN", "代理节点", "订阅节点", "套餐流量", "多端客户端", "工单支持"],
+    "links": [],
+    "contacts": []
+  }
+}
+```
+
+如果前后端不同域，设置后端公网地址：
+
+```json
+{
+  "apiBaseUrl": "https://api.example.com"
+}
+```
+
+重新构建会重新生成 `out`，部署前需要确认生产环境自定义的 `out/config.json` 没有被覆盖。
+
 ## systemd 示例
 
 Web service：
@@ -333,16 +414,19 @@ ExecStart=/usr/local/bin/uv run uvicorn main:app --host 127.0.0.1 --port 8000 --
 
 实际路径以服务器安装位置为准。
 
-## Nginx 反向代理示例
+## Nginx 静态前端与反向代理示例
 
 ```nginx
 server {
     listen 80;
     server_name panel.example.com;
 
+    root /opt/PyBoard/frontend/out;
+    index index.html;
+
     client_max_body_size 20m;
 
-    location / {
+    location /api/ {
         proxy_pass http://127.0.0.1:8000;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
@@ -350,8 +434,36 @@ server {
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
+
+    location /admin/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /notify/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /health {
+        proxy_pass http://127.0.0.1:8000;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
 }
 ```
+
+`location /` 中的 `try_files` 是用户端 SPA 的刷新 fallback。否则直接访问或刷新 `/auth/login`、`/dashboard` 等前端路由时会出现 404。
 
 启用 HTTPS 后，需要在系统配置里把 `app_url` 设置为外部访问地址，例如：
 
@@ -510,6 +622,8 @@ pg_restore -h 127.0.0.1 -U pyboard_admin -d pyboard_db --clean --if-exists pyboa
 
 ## 升级流程
 
+后端升级：
+
 ```bash
 git pull
 uv sync
@@ -519,6 +633,17 @@ uv run pytest
 ```
 
 然后重启 Web 和 Worker。
+
+用户端前端升级：
+
+```bash
+cd frontend
+eval "$(fnm env --use-on-cd)"
+pnpm install
+NEXT_OUTPUT=export pnpm run build
+```
+
+如果生产环境对 `frontend/out/config.json` 做过自定义，重新构建后需要检查该文件是否仍符合生产配置。
 
 生产环境如果不能跑全量测试，至少执行：
 
@@ -534,7 +659,10 @@ uv run python -m app.queues.worker --once
 - PostgreSQL 已配置备份。
 - pg_cron 已安装，`cron.job` 中能看到 `pyboard_%` 定时任务。
 - Web 和 Worker 都由进程管理工具托管。
+- 用户端前端已构建到 `frontend/out`，Nginx root 指向该目录。
+- `frontend/out/config.json` 中的 `apiBaseUrl` 与当前部署方式一致。
 - 反向代理正确传递 `Host`、`X-Forwarded-For`、`X-Forwarded-Proto`。
+- Nginx 的 `/` 路由已配置 `try_files $uri $uri/ /index.html;`，SPA 路由刷新不会 404。
 - `app_url` 是公网 HTTPS 地址。
 - `server_token` 已设置为随机字符串。
 - 邮件配置可用，验证码邮件能发送。

@@ -35,9 +35,7 @@ class SystemService:
         }
 
     async def queue_stats(self) -> dict[str, Any]:
-        queues = {}
-        for name in QUEUE_NAMES:
-            queues[name] = await self._queue_count(name)
+        queues = await self._queue_counts()
         failed = await self.db.execute(select(func.count()).select_from(FailedJob))
         return {
             "queues": queues,
@@ -45,13 +43,17 @@ class SystemService:
         }
 
     async def queue_workload(self) -> list[dict[str, Any]]:
-        return [{"name": name, "jobs": await self._queue_count(name)} for name in QUEUE_NAMES]
+        queues = await self._queue_counts()
+        return [{"name": name, "jobs": queues[name]} for name in QUEUE_NAMES]
 
-    async def _queue_count(self, name: str) -> int:
+    async def _queue_counts(self) -> dict[str, int]:
         result = await self.db.execute(
-            select(func.count())
-            .select_from(QueueJob)
-            .where(QueueJob.queue == name)
+            select(QueueJob.queue, func.count(QueueJob.id))
             .where(QueueJob.status.in_(["pending", "running"]))  # type: ignore[attr-defined]
+            .group_by(QueueJob.queue)
         )
-        return int(result.scalar_one() or 0)
+        queues = {name: 0 for name in QUEUE_NAMES}
+        for name, count in result.all():
+            if name in queues:
+                queues[name] = int(count or 0)
+        return queues

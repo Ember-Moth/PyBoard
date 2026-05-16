@@ -29,6 +29,7 @@ from app.core.deps import (
 from app.core.queue import PostgresQueue
 from app.core.exceptions import AppException
 from app.models.user.dto import UserRead
+from app.queues.names import QUEUE_NAMES
 from app.services.admin_tools import FailedJobService, LogService
 from app.services.auth import AuthService
 from app.services.mail import MailService
@@ -53,7 +54,9 @@ async def system_page(request: Request, auth: AuthService = Depends(get_auth_ser
     return page("admin/pages/system.html.j2", request, admin, "system", "系统状态")
 
 
-@router.get("/fragments/system/status", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/system/status", response_class=HTMLResponse, include_in_schema=False
+)
 async def system_status(
     request: Request,
     auth: AuthService = Depends(get_auth_service),
@@ -62,14 +65,18 @@ async def system_status(
     admin = await current_admin(request, auth)
     if admin is None:
         return unauthorized_fragment()
+    queue = await system_service.queue_stats()
     return template(
         "admin/fragments/system_status.html.j2",
         request,
         {
             "admin": admin,
             "status": await system_service.status(),
-            "queue": await system_service.queue_stats(),
-            "workload": await system_service.queue_workload(),
+            "queue": queue,
+            "workload": [
+                {"name": name, "jobs": queue["queues"].get(name, 0)}
+                for name in QUEUE_NAMES
+            ],
         },
     )
 
@@ -82,7 +89,9 @@ async def logs_page(request: Request, auth: AuthService = Depends(get_auth_servi
     return page("admin/pages/logs.html.j2", request, admin, "logs", "系统事件")
 
 
-@router.get("/fragments/logs/table", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/logs/table", response_class=HTMLResponse, include_in_schema=False
+)
 async def logs_table(
     request: Request,
     offset: int = 0,
@@ -108,7 +117,9 @@ async def logs_table(
     )
 
 
-@router.get("/fragments/logs/detail", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/logs/detail", response_class=HTMLResponse, include_in_schema=False
+)
 async def log_detail(
     request: Request,
     log_id: int,
@@ -122,10 +133,16 @@ async def log_detail(
         log = await log_service.get_log(log_id)
     except AppException as exc:
         return action_error(request, exc.detail)
-    return template("admin/fragments/log_detail.html.j2", request, {"admin": admin, "log": log})
+    return template(
+        "admin/fragments/log_detail.html.j2", request, {"admin": admin, "log": log}
+    )
 
 
-@router.post("/actions/logs/{log_id}/delete", response_class=HTMLResponse, include_in_schema=False)
+@router.post(
+    "/actions/logs/{log_id}/delete",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
 async def delete_log_action(
     log_id: int,
     request: Request,
@@ -155,14 +172,20 @@ async def delete_log_action(
 
 
 @router.get("/failed-jobs", response_class=HTMLResponse, include_in_schema=False)
-async def failed_jobs_page(request: Request, auth: AuthService = Depends(get_auth_service)):
+async def failed_jobs_page(
+    request: Request, auth: AuthService = Depends(get_auth_service)
+):
     admin = await current_admin(request, auth)
     if admin is None:
         return redirect_to_login(request)
-    return page("admin/pages/failed_jobs.html.j2", request, admin, "failed_jobs", "失败任务")
+    return page(
+        "admin/pages/failed_jobs.html.j2", request, admin, "failed_jobs", "失败任务"
+    )
 
 
-@router.get("/fragments/failed-jobs/table", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/failed-jobs/table", response_class=HTMLResponse, include_in_schema=False
+)
 async def failed_jobs_table(
     request: Request,
     offset: int = 0,
@@ -176,7 +199,11 @@ async def failed_jobs_table(
     return await failed_jobs_table_response(request, admin, job_service, offset, limit)
 
 
-@router.get("/fragments/failed-jobs/detail", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/failed-jobs/detail",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
 async def failed_job_detail(
     request: Request,
     job_id: int,
@@ -190,10 +217,18 @@ async def failed_job_detail(
         job = await job_service.get_job(job_id)
     except AppException as exc:
         return action_error(request, exc.detail)
-    return template("admin/fragments/failed_job_detail.html.j2", request, {"admin": admin, "job": job})
+    return template(
+        "admin/fragments/failed_job_detail.html.j2",
+        request,
+        {"admin": admin, "job": job},
+    )
 
 
-@router.post("/actions/failed-jobs/{job_id}/retry", response_class=HTMLResponse, include_in_schema=False)
+@router.post(
+    "/actions/failed-jobs/{job_id}/retry",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
 async def retry_failed_job_action(
     job_id: int,
     request: Request,
@@ -214,7 +249,11 @@ async def retry_failed_job_action(
     return await failed_jobs_table_response(request, admin, job_service)
 
 
-@router.post("/actions/failed-jobs/{job_id}/delete", response_class=HTMLResponse, include_in_schema=False)
+@router.post(
+    "/actions/failed-jobs/{job_id}/delete",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
 async def delete_failed_job_action(
     job_id: int,
     request: Request,
@@ -248,7 +287,9 @@ async def mail_page(request: Request, auth: AuthService = Depends(get_auth_servi
     return page("admin/pages/mail.html.j2", request, admin, "mail", "邮件管理")
 
 
-@router.get("/fragments/mail/logs", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/mail/logs", response_class=HTMLResponse, include_in_schema=False
+)
 async def mail_logs(
     request: Request,
     offset: int = 0,
@@ -262,15 +303,25 @@ async def mail_logs(
     return await mail_logs_response(request, admin, mail_service, offset, limit)
 
 
-@router.get("/fragments/mail/send-form", response_class=HTMLResponse, include_in_schema=False)
-async def mail_send_form(request: Request, auth: AuthService = Depends(get_auth_service)):
+@router.get(
+    "/fragments/mail/send-form", response_class=HTMLResponse, include_in_schema=False
+)
+async def mail_send_form(
+    request: Request, auth: AuthService = Depends(get_auth_service)
+):
     admin = await current_admin(request, auth)
     if admin is None:
         return unauthorized_fragment()
-    return template("admin/fragments/mail_send_form.html.j2", request, {"admin": admin, "templates": _mail_templates()})
+    return template(
+        "admin/fragments/mail_send_form.html.j2",
+        request,
+        {"admin": admin, "templates": _mail_templates()},
+    )
 
 
-@router.get("/fragments/mail/log-detail", response_class=HTMLResponse, include_in_schema=False)
+@router.get(
+    "/fragments/mail/log-detail", response_class=HTMLResponse, include_in_schema=False
+)
 async def mail_log_detail(
     request: Request,
     log_id: int,
@@ -284,7 +335,9 @@ async def mail_log_detail(
         log = await mail_service.get_log(log_id)
     except AppException as exc:
         return action_error(request, exc.detail)
-    return template("admin/fragments/mail_log_detail.html.j2", request, {"admin": admin, "log": log})
+    return template(
+        "admin/fragments/mail_log_detail.html.j2", request, {"admin": admin, "log": log}
+    )
 
 
 @router.post("/actions/mail/send", response_class=HTMLResponse, include_in_schema=False)
@@ -361,7 +414,12 @@ async def failed_jobs_table_response(
     return template(
         "admin/fragments/failed_jobs_table.html.j2",
         request,
-        {"admin": admin, "jobs": await job_service.list_jobs(offset, limit), "offset": offset, "limit": limit},
+        {
+            "admin": admin,
+            "jobs": await job_service.list_jobs(offset, limit),
+            "offset": offset,
+            "limit": limit,
+        },
     )
 
 
@@ -377,7 +435,12 @@ async def mail_logs_response(
     return template(
         "admin/fragments/mail_logs_table.html.j2",
         request,
-        {"admin": admin, "logs": await mail_service.list_logs(offset, limit), "offset": offset, "limit": limit},
+        {
+            "admin": admin,
+            "logs": await mail_service.list_logs(offset, limit),
+            "offset": offset,
+            "limit": limit,
+        },
     )
 
 

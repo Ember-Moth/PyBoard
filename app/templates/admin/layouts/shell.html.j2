@@ -1,6 +1,12 @@
 {% extends "admin/layouts/base.html.j2" %}
 {% block body %}
-<div class="page">
+<div
+  class="page"
+  hx-boost="true"
+  hx-target=".page"
+  hx-select=".page"
+  hx-swap="outerHTML show:window:top"
+  hx-push-url="true">
   <header class="navbar navbar-expand-md d-print-none" data-bs-theme="dark">
     <div class="container-xl">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="打开导航">
@@ -14,7 +20,7 @@
           {{ title }}
         </div>
         <div class="nav-item">
-          <a href="/admin/logout" class="btn btn-outline-light">退出</a>
+          <a href="/admin/logout" class="btn btn-outline-light" hx-boost="false">退出</a>
         </div>
       </div>
     </div>

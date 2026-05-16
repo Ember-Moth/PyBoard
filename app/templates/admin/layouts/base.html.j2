@@ -5,16 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="csrf-token" content="{{ csrf_token }}">
   <title>{{ title }} - Admin</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+  <link rel="preconnect" href="https://unpkg.com">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/css/tabler.min.css">
   <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+  <style>
+    body.admin-loading::before {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1100;
+      width: 100%;
+      height: 2px;
+      content: "";
+      background: var(--tblr-primary);
+      animation: admin-loading-bar 900ms ease-in-out infinite;
+      transform-origin: left center;
+    }
+
+    @keyframes admin-loading-bar {
+      0% {
+        transform: scaleX(0.12);
+        opacity: 0.55;
+      }
+
+      50% {
+        transform: scaleX(0.72);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scaleX(1);
+        opacity: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   {% block body %}{% endblock %}
   <script src="https://cdn.jsdelivr.net/npm/@tabler/core@1.0.0/dist/js/tabler.min.js"></script>
   <script>
+    function setAdminLoading(event, isLoading) {
+      if (event.detail.requestConfig?.boosted) {
+        document.body.classList.toggle("admin-loading", isLoading);
+      }
+    }
+
     document.body.addEventListener("htmx:configRequest", function (event) {
       const token = document.querySelector('meta[name="csrf-token"]')?.content;
       if (token) event.detail.headers["X-CSRF-Token"] = token;
+    });
+    document.body.addEventListener("htmx:beforeRequest", function (event) {
+      setAdminLoading(event, true);
+    });
+    document.body.addEventListener("htmx:afterRequest", function (event) {
+      setAdminLoading(event, false);
+    });
+    document.body.addEventListener("htmx:sendError", function (event) {
+      setAdminLoading(event, false);
+    });
+    document.body.addEventListener("htmx:responseError", function (event) {
+      setAdminLoading(event, false);
+    });
+    document.body.addEventListener("htmx:beforeSwap", function (event) {
+      const responseUrl = event.detail.xhr?.responseURL || "";
+      if (event.detail.requestConfig?.boosted && responseUrl.includes("/admin/login")) {
+        event.detail.shouldSwap = false;
+        window.location.href = responseUrl;
+      }
+    });
+    document.body.addEventListener("htmx:afterSwap", function (event) {
+      if (event.detail.target?.classList?.contains("page")) {
+        const root = document.getElementById("modal-root");
+        if (root) root.innerHTML = "";
+      }
     });
     document.body.addEventListener("admin:close-modal", function () {
       const root = document.getElementById("modal-root");

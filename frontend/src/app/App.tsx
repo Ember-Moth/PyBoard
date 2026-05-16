@@ -1,22 +1,25 @@
 "use client";
 
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material";
+import dynamic from "next/dynamic";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { type ComponentType, useEffect } from "react";
 import PageContainer from "@/components/layout/PageContainer";
 import DashboardLayout from "@/layouts/dashboard/DashboardLayout";
-import ForgotPasswordPage from "@/views/auth/ForgotPasswordPage";
-import LoginPage from "@/views/auth/LoginPage";
-import RegisterPage from "@/views/auth/RegisterPage";
-import DashboardPage from "@/views/dashboard/DashboardPage";
-import InvitePage from "@/views/invite/InvitePage";
+import { useSpaPathname } from "@/lib/spa-navigation";
 import LandingPage from "@/views/landing/LandingPage";
-import OrdersPage from "@/views/orders/OrdersPage";
-import PlansPage from "@/views/plans/PlansPage";
-import SettingsPage from "@/views/settings/SettingsPage";
-import SubscribePage from "@/views/subscribe/SubscribePage";
-import TicketsPage from "@/views/tickets/TicketsPage";
+
+const ForgotPasswordPage = dynamic(() => import("@/views/auth/ForgotPasswordPage"), { loading: RouteLoading });
+const LoginPage = dynamic(() => import("@/views/auth/LoginPage"), { loading: RouteLoading });
+const RegisterPage = dynamic(() => import("@/views/auth/RegisterPage"), { loading: RouteLoading });
+const DashboardPage = dynamic(() => import("@/views/dashboard/DashboardPage"), { loading: RouteLoading });
+const InvitePage = dynamic(() => import("@/views/invite/InvitePage"), { loading: RouteLoading });
+const OrdersPage = dynamic(() => import("@/views/orders/OrdersPage"), { loading: RouteLoading });
+const PlansPage = dynamic(() => import("@/views/plans/PlansPage"), { loading: RouteLoading });
+const SettingsPage = dynamic(() => import("@/views/settings/SettingsPage"), { loading: RouteLoading });
+const SubscribePage = dynamic(() => import("@/views/subscribe/SubscribePage"), { loading: RouteLoading });
+const TicketsPage = dynamic(() => import("@/views/tickets/TicketsPage"), { loading: RouteLoading });
 
 const AUTH_ROUTES: Record<string, ComponentType> = {
   "/auth/forgot": ForgotPasswordPage,
@@ -35,7 +38,7 @@ const DASHBOARD_ROUTES: Record<string, ComponentType> = {
 };
 
 export default function App() {
-  const pathname = normalizePath(usePathname());
+  const pathname = useSpaPathname();
   const router = useRouter();
 
   useEffect(() => {
@@ -74,9 +77,10 @@ function SpaNotFound() {
   );
 }
 
-function normalizePath(pathname: string | null): string {
-  if (!pathname || pathname === "/") {
-    return "/";
-  }
-  return pathname.replace(/\/+$/, "");
+function RouteLoading() {
+  return (
+    <Box minHeight="50vh" display="flex" alignItems="center" justifyContent="center">
+      <CircularProgress size={28} />
+    </Box>
+  );
 }

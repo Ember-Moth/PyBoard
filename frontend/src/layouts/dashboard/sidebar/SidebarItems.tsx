@@ -1,10 +1,9 @@
 import { Box } from "@mui/material";
 import { IconPoint } from "@tabler/icons-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import type { ComponentType } from "react";
+import { type AnchorHTMLAttributes, type ComponentType, forwardRef, type MouseEvent } from "react";
 import { Menu, MenuItem, Sidebar as MUI_Sidebar, Logo as SidebarLogo, Submenu } from "react-mui-sidebar";
 import { useSiteConfig } from "@/contexts/SiteConfigContext";
+import { navigateSpa, useSpaPathname } from "@/lib/spa-navigation";
 
 import Menuitems from "./MenuItems";
 
@@ -19,6 +18,29 @@ type SidebarMenuItem = {
   href?: string;
   children?: SidebarMenuItem[];
 };
+
+type SpaLinkProps = AnchorHTMLAttributes<HTMLAnchorElement> & {
+  to?: string;
+};
+
+const SpaLink = forwardRef<HTMLAnchorElement, SpaLinkProps>(({ href, onClick, target, to, ...props }, ref) => {
+  const destination = href || to || "#";
+
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(event);
+    if (shouldUseBrowserNavigation(event, target)) {
+      return;
+    }
+
+    if (navigateSpa(destination)) {
+      event.preventDefault();
+    }
+  };
+
+  return <a ref={ref} href={destination} target={target} onClick={handleClick} {...props} />;
+});
+
+SpaLink.displayName = "SpaLink";
 
 const renderMenuItems = (items: SidebarMenuItem[], pathDirect: string) => {
   return items.map((item) => {
@@ -44,7 +66,7 @@ const renderMenuItems = (items: SidebarMenuItem[], pathDirect: string) => {
           borderRadius="8px"
           icon={itemIcon}
           link={item.href || "#"}
-          component={Link}
+          component={SpaLink}
         >
           {item.title}
         </MenuItem>
@@ -54,12 +76,12 @@ const renderMenuItems = (items: SidebarMenuItem[], pathDirect: string) => {
 };
 
 const SidebarItems = () => {
-  const pathname = usePathname();
+  const pathname = useSpaPathname();
   const { appName, logo } = useSiteConfig();
 
   return (
     <MUI_Sidebar width="100%" showProfile={false} themeColor="#5D87FF" themeSecondaryColor="#49beff">
-      <SidebarLogo component={Link} to="/dashboard">
+      <SidebarLogo component={SpaLink} href="/dashboard">
         {logo ? (
           <Box component="img" src={logo} alt={appName} sx={{ maxHeight: 40, maxWidth: 150, objectFit: "contain" }} />
         ) : (
@@ -72,3 +94,15 @@ const SidebarItems = () => {
 };
 
 export default SidebarItems;
+
+function shouldUseBrowserNavigation(event: MouseEvent<HTMLAnchorElement>, target?: string): boolean {
+  return (
+    event.defaultPrevented ||
+    event.button !== 0 ||
+    event.metaKey ||
+    event.altKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    target === "_blank"
+  );
+}
