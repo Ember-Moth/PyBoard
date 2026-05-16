@@ -85,6 +85,74 @@ export type SubscribeServer = {
   cache_key?: string;
 };
 
+export type PlanPeriodKey =
+  | "month_price"
+  | "quarter_price"
+  | "half_year_price"
+  | "year_price"
+  | "two_year_price"
+  | "three_year_price"
+  | "onetime_price"
+  | "reset_price";
+
+export type PlanPublic = {
+  id: number;
+  group_id: number;
+  transfer_enable: number;
+  device_limit?: number | null;
+  name: string;
+  speed_limit?: number | null;
+  sort?: number | null;
+  content?: string | null;
+  month_price?: number | null;
+  quarter_price?: number | null;
+  half_year_price?: number | null;
+  year_price?: number | null;
+  two_year_price?: number | null;
+  three_year_price?: number | null;
+  onetime_price?: number | null;
+  reset_price?: number | null;
+  reset_traffic_method?: number | null;
+  capacity_limit?: number | null;
+  created_at: number;
+};
+
+export type PaymentMethod = {
+  id: number;
+  name: string;
+  payment: string;
+  icon?: string | null;
+  handling_fee_fixed?: number | null;
+  handling_fee_percent?: number | null;
+};
+
+export type OrderPublic = {
+  id: number;
+  plan_id: number;
+  period: string;
+  trade_no: string;
+  total_amount: number;
+  status: number;
+  paid_at?: number | null;
+  created_at: number;
+};
+
+export type OrderRead = OrderPublic & {
+  handling_amount?: number | null;
+  balance_amount?: number | null;
+  updated_at: number;
+};
+
+export type OrderDetail = {
+  order: OrderRead;
+  plan: Partial<PlanPublic> | null;
+};
+
+export type PaymentResult = {
+  type: -1 | 0 | 1;
+  data: string | boolean;
+};
+
 export type TrafficLog = {
   id?: number;
   user_id: number;

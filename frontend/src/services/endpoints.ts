@@ -24,4 +24,19 @@ export const endpoints = {
   notices: {
     list: (page = 1, size = 5) => `/api/v1/notices?page=${page}&size=${size}`,
   },
+  plans: {
+    list: "/api/v1/plans",
+    detail: (planId: number) => `/api/v1/plans/${planId}`,
+  },
+  orders: {
+    list: (status?: number) => `/api/v1/orders${status === undefined ? "" : `?status=${status}`}`,
+    detail: (tradeNo: string) => `/api/v1/orders/detail?trade_no=${encodeURIComponent(tradeNo)}`,
+    create: "/api/v1/orders",
+    checkout: "/api/v1/orders/checkout",
+    check: (tradeNo: string) => `/api/v1/orders/check?trade_no=${encodeURIComponent(tradeNo)}`,
+    cancel: "/api/v1/orders/cancel",
+  },
+  paymentMethods: {
+    list: "/api/v1/payment-methods",
+  },
 } as const;
