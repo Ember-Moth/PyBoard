@@ -69,6 +69,22 @@ export type SubscribeInfo = {
   allow_new_period?: number;
 };
 
+export type SubscribeServer = {
+  id?: number;
+  type?: string;
+  protocol?: string;
+  name?: string;
+  host?: string;
+  port?: string | number;
+  server_port?: number | null;
+  rate?: number;
+  network?: string;
+  tls?: number | boolean | string | null;
+  first_port?: string;
+  multi_port?: boolean;
+  cache_key?: string;
+};
+
 export type TrafficLog = {
   id?: number;
   user_id: number;

@@ -1,6 +1,6 @@
 import { endpoints } from "@/services/endpoints";
 import { get, post } from "@/services/http";
-import type { SubscribeInfo, TrafficLog, UserConfig, UserProfile } from "@/types/api";
+import type { SubscribeInfo, SubscribeServer, TrafficLog, UserConfig, UserProfile } from "@/types/api";
 
 export function getUserProfile(): Promise<UserProfile> {
   return get<UserProfile>(endpoints.user.info);
@@ -8,6 +8,10 @@ export function getUserProfile(): Promise<UserProfile> {
 
 export function getSubscribeInfo(): Promise<SubscribeInfo> {
   return get<SubscribeInfo>(endpoints.user.subscribe);
+}
+
+export function getUserServers(): Promise<SubscribeServer[]> {
+  return get<SubscribeServer[]>(endpoints.user.servers, { cache: "no-store" });
 }
 
 export function getUserStats(): Promise<number[]> {

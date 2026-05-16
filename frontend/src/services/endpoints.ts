@@ -13,6 +13,7 @@ export const endpoints = {
   user: {
     info: "/api/v1/user/info",
     subscribe: "/api/v1/user/subscribe",
+    servers: "/api/v1/user/servers",
     stats: "/api/v1/user/stats",
     trafficLogs: (limit = 8) => `/api/v1/user/traffic-logs?limit=${limit}`,
     resetSecurity: "/api/v1/user/reset-security",
