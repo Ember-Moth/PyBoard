@@ -26,7 +26,9 @@
     </div>
   </header>
   {% include "admin/partials/sidebar.html.j2" %}
-  <div class="page-wrapper">
+  <div
+    class="page-wrapper"
+    hx-disinherit="hx-boost hx-target hx-select hx-swap hx-push-url">
     <div class="page-body">
       <div class="container-xl">
         {% block content %}{% endblock %}
