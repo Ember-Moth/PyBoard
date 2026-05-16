@@ -48,7 +48,7 @@ register_request_logging(app)
 
 app.include_router(auth.router)
 app.include_router(account.router)
-app.include_router(comm.guest_router)
+app.include_router(comm.common_router)
 app.include_router(comm.user_router)
 app.include_router(comm.telegram_router)
 app.include_router(user.router)

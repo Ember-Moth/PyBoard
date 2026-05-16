@@ -1,13 +1,14 @@
+import { getCommonConfig } from "@/services/common.service";
 import { getPaymentMethods } from "@/services/payment.service";
 import { getPlans } from "@/services/plan.service";
-import { getSubscribeInfo, getUserConfig } from "@/services/user.service";
-import type { PaymentMethod, PlanPublic, SubscribeInfo, UserConfig } from "@/types/api";
+import { getSubscribeInfo } from "@/services/user.service";
+import type { CommonConfig, PaymentMethod, PlanPublic, SubscribeInfo } from "@/types/api";
 
 export type PlansPageData = {
   plans: PlanPublic[];
   payments: PaymentMethod[];
   subscribe: SubscribeInfo;
-  config: UserConfig;
+  config: CommonConfig;
 };
 
 export async function getPlansPageData(): Promise<PlansPageData> {
@@ -15,7 +16,7 @@ export async function getPlansPageData(): Promise<PlansPageData> {
     getPlans(),
     getPaymentMethods(),
     getSubscribeInfo(),
-    getUserConfig(),
+    getCommonConfig(),
   ]);
 
   return {

@@ -1,13 +1,14 @@
+import { getCommonConfig } from "@/services/common.service";
 import { getNotices } from "@/services/notice.service";
-import { getSubscribeInfo, getTrafficLogs, getUserConfig, getUserProfile, getUserStats } from "@/services/user.service";
-import type { NoticePublic, PaginatedData, SubscribeInfo, TrafficLog, UserConfig, UserProfile } from "@/types/api";
+import { getSubscribeInfo, getTrafficLogs, getUserProfile, getUserStats } from "@/services/user.service";
+import type { CommonConfig, NoticePublic, PaginatedData, SubscribeInfo, TrafficLog, UserProfile } from "@/types/api";
 
 export type DashboardData = {
   profile: UserProfile;
   subscribe: SubscribeInfo;
   stats: number[];
   trafficLogs: TrafficLog[];
-  config: UserConfig;
+  config: CommonConfig;
   notices: PaginatedData<NoticePublic>;
   now: number;
 };
@@ -18,7 +19,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     getSubscribeInfo(),
     getUserStats(),
     getTrafficLogs(8),
-    getUserConfig(),
+    getCommonConfig(),
     getNotices(1, 5),
   ]);
 

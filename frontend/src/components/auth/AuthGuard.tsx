@@ -19,7 +19,7 @@ export default function AuthGuard({ children }: Props) {
   useEffect(() => {
     const token = getAuthToken();
     if (!token) {
-      router.replace("/authentication/login");
+      router.replace("/auth/login");
       return;
     }
 
@@ -29,7 +29,7 @@ export default function AuthGuard({ children }: Props) {
         if (error instanceof ApiError && error.status === 401) {
           clearAuthToken();
         }
-        router.replace("/authentication/login");
+        router.replace("/auth/login");
       });
   }, [router]);
 

@@ -57,6 +57,9 @@ async def test_account_profile_password_and_quick_login(authed_client, client):
 @pytest.mark.asyncio
 async def test_email_verify_forget_and_comm_config(client, engine, cache):
     await _set_setting(engine, "app_url", "https://panel.example.com")
+    await _set_setting(engine, "app_name", "Guest Panel")
+    await _set_setting(engine, "app_description", "Guest panel description")
+    await _set_setting(engine, "logo", "https://panel.example.com/logo.png")
 
     await client.post(
         "/api/v1/auth/register",
@@ -84,9 +87,27 @@ async def test_email_verify_forget_and_comm_config(client, engine, cache):
     )
     assert res.status_code == 200
 
-    res = await client.get("/api/v1/guest/comm/config")
+    res = await client.get("/api/v1/common/config")
     assert res.status_code == 200
-    assert res.json()["data"]["app_url"] == "https://panel.example.com"
+    data = res.json()["data"]
+    assert data["logo"] == "https://panel.example.com/logo.png"
+    assert data["stop_register"] == 0
+    assert data["app_name"] == "Guest Panel"
+    assert data["app_description"] == "Guest panel description"
+    assert data["app_url"] == "https://panel.example.com"
+    assert data["subscribe_url"] == ""
+    assert data["subscribe_path"] == ""
+    assert data["try_out_plan_id"] == 0
+    assert data["try_out_hour"] == 1
+    assert data["tos_url"] == ""
+    assert data["currency"] == "CNY"
+    assert data["currency_symbol"] == "¥"
+    assert data["is_telegram"] == 0
+    assert data["ticket_status"] == 0
+    assert data["invite_gen_limit"] == 5
+    assert data["withdraw_methods"] == ["alipay", "usdt", "bank"]
+    assert data["withdraw_close"] == 0
+    assert data["commission_withdraw_limit"] == 100
 
 
 @pytest.mark.asyncio

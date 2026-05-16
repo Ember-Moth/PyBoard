@@ -14,46 +14,36 @@ from app.services.payment import PaymentService
 from app.services.setting import SettingService
 from app.services.telegram import TelegramService
 
-guest_router = APIRouter(prefix="/api/v1/guest/comm", tags=["访客配置"])
+common_router = APIRouter(prefix="/api/v1/common", tags=["公共配置"])
 user_router = APIRouter(prefix="/api/v1/comm", tags=["公共配置"])
 telegram_router = APIRouter(prefix="/api/v1/telegram", tags=["Telegram"])
 
 
-@guest_router.get("/config", response_model=ApiResponse[dict])
-async def guest_config(service: SettingService = Depends(get_setting_service)):
-    """获取访客端公开配置。"""
+@common_router.get("/config", response_model=ApiResponse[dict])
+async def common_config(service: SettingService = Depends(get_setting_service)):
+    """获取前端公开配置。"""
     email_whitelist_enabled = await service.get_int("email_whitelist_enable", 0)
+    site_config = (await service.fetch_config("site")).get("site", {})
     return success(
         data={
+            **site_config,
             "tos_url": await service.get_str("tos_url", ""),
             "is_email_verify": 1 if await service.get_int("email_verify", 0) else 0,
             "is_invite_force": 1 if await service.get_int("invite_force", 0) else 0,
+            "is_email_whitelist": 1 if email_whitelist_enabled else 0,
             "email_whitelist_suffix": await service.get_json("email_whitelist_suffix", []) if email_whitelist_enabled else 0,
             "is_recaptcha": 1 if await service.get_int("recaptcha_enable", 0) else 0,
             "recaptcha_provider": "turnstile",
             "recaptcha_site_key": await service.get_str("recaptcha_site_key", ""),
             "turnstile_site_key": await service.get_str("recaptcha_site_key", ""),
-            "app_description": await service.get_str("app_description", ""),
-            "app_url": await service.get_str("app_url", ""),
-            "logo": await service.get_str("logo", ""),
-        }
-    )
-
-
-@user_router.get("/config", response_model=ApiResponse[dict])
-async def user_config(
-    current_user: UserRead = Depends(get_current_user),
-    service: SettingService = Depends(get_setting_service),
-):
-    """获取登录用户公共配置。"""
-    _ = current_user
-    return success(
-        data={
             "is_telegram": await service.get_int("telegram_bot_enable", 0),
             "telegram_discuss_link": await service.get_str("telegram_discuss_link", ""),
+            "ticket_status": await service.get_int("ticket_status", 0),
             "stripe_pk": await service.get_str("stripe_pk_live", ""),
+            "invite_gen_limit": await service.get_int("invite_gen_limit", 5),
             "withdraw_methods": await service.get_json("commission_withdraw_method", ["alipay", "usdt", "bank"]),
             "withdraw_close": await service.get_int("withdraw_close_enable", 0),
+            "commission_withdraw_limit": await service.get_int("commission_withdraw_limit", 100),
             "currency": await service.get_str("currency", "CNY"),
             "currency_symbol": await service.get_str("currency_symbol", "¥"),
             "commission_distribution_enable": await service.get_int("commission_distribution_enable", 0),

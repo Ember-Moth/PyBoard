@@ -7,11 +7,15 @@ export const endpoints = {
     emailVerify: "/api/v1/auth/email-verify",
     forget: "/api/v1/auth/forget",
   },
-  guest: {
-    config: "/api/v1/guest/comm/config",
+  common: {
+    config: "/api/v1/common/config",
   },
   user: {
     info: "/api/v1/user/info",
+    profile: "/api/v1/user/profile",
+    changePassword: "/api/v1/user/change-password",
+    quickLoginUrl: "/api/v1/user/quick-login-url",
+    unbindTelegram: "/api/v1/user/unbind-telegram",
     subscribe: "/api/v1/user/subscribe",
     servers: "/api/v1/user/servers",
     stats: "/api/v1/user/stats",
@@ -19,7 +23,7 @@ export const endpoints = {
     resetSecurity: "/api/v1/user/reset-security",
   },
   comm: {
-    config: "/api/v1/comm/config",
+    stripePublicKey: "/api/v1/comm/stripe-public-key",
   },
   notices: {
     list: (page = 1, size = 5) => `/api/v1/notices?page=${page}&size=${size}`,
@@ -38,5 +42,19 @@ export const endpoints = {
   },
   paymentMethods: {
     list: "/api/v1/payment-methods",
+  },
+  tickets: {
+    list: (offset = 0, limit = 50) => `/api/v1/tickets?offset=${offset}&limit=${limit}`,
+    detail: (ticketId: number) => `/api/v1/tickets/${ticketId}`,
+    create: "/api/v1/tickets",
+    reply: (ticketId: number) => `/api/v1/tickets/${ticketId}/reply`,
+    close: (ticketId: number) => `/api/v1/tickets/${ticketId}/close`,
+    withdraw: "/api/v1/tickets/withdraw",
+  },
+  invite: {
+    overview: "/api/v1/invite",
+    createCode: "/api/v1/invite/codes",
+    commissionLogs: (offset = 0, limit = 50) => `/api/v1/invite/commission-logs?offset=${offset}&limit=${limit}`,
+    transferCommission: "/api/v1/invite/commission/transfer",
   },
 } as const;

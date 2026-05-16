@@ -8,26 +8,39 @@ export type TokenResponse = {
   auth_token: string;
 };
 
-export type GuestConfig = {
+export type CommonConfig = {
+  logo?: string;
+  stop_register?: number;
+  app_name?: string;
+  app_description?: string;
+  app_url?: string;
+  subscribe_url?: string;
+  subscribe_path?: string;
+  try_out_plan_id?: number;
+  try_out_hour?: number;
   tos_url?: string;
+  currency?: string;
+  currency_symbol?: string;
   is_email_verify?: number;
   is_invite_force?: number;
+  is_email_whitelist?: number;
+  email_whitelist_suffix?: string[] | 0;
   is_recaptcha?: number;
   recaptcha_provider?: string;
   recaptcha_site_key?: string;
   turnstile_site_key?: string;
-  app_description?: string;
-  app_url?: string;
-  logo?: string;
-};
-
-export type UserConfig = {
   is_telegram?: number;
   telegram_discuss_link?: string;
+  ticket_status?: number;
+  stripe_pk?: string;
+  invite_gen_limit?: number;
   withdraw_methods?: string[];
   withdraw_close?: number;
-  currency?: string;
-  currency_symbol?: string;
+  commission_withdraw_limit?: number;
+  commission_distribution_enable?: number;
+  commission_distribution_l1?: number | null;
+  commission_distribution_l2?: number | null;
+  commission_distribution_l3?: number | null;
 };
 
 export type UserProfile = {
@@ -37,11 +50,34 @@ export type UserProfile = {
   last_login_at?: number | null;
   created_at: number;
   banned: boolean;
+  auto_renewal?: number;
+  remind_expire?: number;
+  remind_traffic?: number;
   expired_at?: number | null;
   balance: number;
   commission_balance: number;
   plan_id?: number | null;
+  discount?: number | null;
+  commission_rate?: number | null;
+  telegram_id?: number | null;
   uuid: string;
+  avatar_url?: string;
+};
+
+export type UserProfileUpdate = {
+  auto_renewal?: number;
+  remind_expire?: number;
+  remind_traffic?: number;
+};
+
+export type ChangePasswordParams = {
+  oldPassword: string;
+  newPassword: string;
+};
+
+export type SecurityResetResult = {
+  uuid: string;
+  token: string;
 };
 
 export type SubscribePlan = {
@@ -176,4 +212,76 @@ export type PaginatedData<T> = {
   total: number;
   page: number;
   size: number;
+};
+
+export type TicketLevel = 0 | 1 | 2;
+
+export type TicketPublic = {
+  id: number;
+  user_id: number;
+  subject: string;
+  level: TicketLevel;
+  status: number;
+  reply_status: number;
+  created_at: number;
+};
+
+export type TicketRead = TicketPublic & {
+  updated_at: number;
+};
+
+export type TicketMessage = {
+  id: number;
+  user_id: number;
+  ticket_id: number;
+  message: string;
+  is_me?: boolean | null;
+  created_at: number;
+};
+
+export type TicketDetail = {
+  ticket: TicketRead;
+  messages: TicketMessage[];
+};
+
+export type TicketCreateParams = {
+  subject: string;
+  level: TicketLevel;
+  message: string;
+};
+
+export type WithdrawTicketParams = {
+  withdrawMethod: string;
+  withdrawAccount: string;
+};
+
+export type InviteCode = {
+  id: number;
+  user_id: number;
+  code: string;
+  status: number;
+  pv: number;
+  created_at: number;
+  updated_at?: number;
+};
+
+export type InviteOverview = {
+  codes: InviteCode[];
+  stat: [
+    registeredCount: number,
+    paidCommission: number,
+    pendingCommission: number,
+    commissionRate: number,
+    commissionBalance: number,
+  ];
+};
+
+export type CommissionLog = {
+  id: number;
+  invite_user_id: number;
+  user_id: number;
+  trade_no: string;
+  order_amount: number;
+  get_amount: number;
+  created_at: number;
 };

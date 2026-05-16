@@ -1,4 +1,5 @@
 import { getAuthToken } from "@/lib/auth";
+import { getApiBaseUrl } from "@/services/runtime-config.service";
 import type { ApiResponse } from "@/types/api";
 
 type RequestOptions = RequestInit & {
@@ -6,8 +7,6 @@ type RequestOptions = RequestInit & {
 };
 
 type ServiceOptions = Omit<RequestOptions, "body" | "method">;
-
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
 
 export class ApiError extends Error {
   status: number;
@@ -30,7 +29,7 @@ export async function request<T>(endpoint: string, options: RequestOptions = {})
     requestHeaders.set("Authorization", token);
   }
 
-  const response = await fetch(apiUrl(endpoint), {
+  const response = await fetch(await apiUrl(endpoint), {
     ...init,
     headers: requestHeaders,
   });
@@ -74,9 +73,9 @@ export function patch<T>(endpoint: string, body?: unknown, options: ServiceOptio
   });
 }
 
-function apiUrl(endpoint: string): string {
+async function apiUrl(endpoint: string): Promise<string> {
   if (/^https?:\/\//.test(endpoint)) {
     return endpoint;
   }
-  return `${API_BASE_URL}${endpoint}`;
+  return `${await getApiBaseUrl()}${endpoint}`;
 }

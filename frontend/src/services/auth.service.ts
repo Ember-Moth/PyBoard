@@ -1,6 +1,6 @@
 import { endpoints } from "@/services/endpoints";
 import { get, post } from "@/services/http";
-import type { GuestConfig, TokenResponse, UserProfile } from "@/types/api";
+import type { TokenResponse, UserProfile } from "@/types/api";
 
 type LoginParams = {
   email: string;
@@ -22,10 +22,6 @@ type SendEmailVerifyParams = {
 type ForgetPasswordParams = LoginParams & {
   emailCode: string;
 };
-
-export function getGuestConfig(): Promise<GuestConfig> {
-  return get<GuestConfig>(endpoints.guest.config, { auth: false });
-}
 
 export function login({ email, password, recaptchaData }: LoginParams): Promise<TokenResponse> {
   return post<TokenResponse>(

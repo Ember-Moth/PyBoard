@@ -1,16 +1,16 @@
+import { getCommonConfig } from "@/services/common.service";
 import { getOrders } from "@/services/order.service";
 import { getPaymentMethods } from "@/services/payment.service";
-import { getUserConfig } from "@/services/user.service";
-import type { OrderPublic, PaymentMethod, UserConfig } from "@/types/api";
+import type { CommonConfig, OrderPublic, PaymentMethod } from "@/types/api";
 
 export type OrdersPageData = {
   orders: OrderPublic[];
   payments: PaymentMethod[];
-  config: UserConfig;
+  config: CommonConfig;
 };
 
 export async function getOrdersPageData(status?: number): Promise<OrdersPageData> {
-  const [orders, payments, config] = await Promise.all([getOrders(status), getPaymentMethods(), getUserConfig()]);
+  const [orders, payments, config] = await Promise.all([getOrders(status), getPaymentMethods(), getCommonConfig()]);
 
   return {
     orders,

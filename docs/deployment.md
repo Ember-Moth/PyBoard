@@ -6,7 +6,7 @@
 
 - Python >= 3.14
 - uv
-- PostgreSQL 14+，推荐 15+
+- PostgreSQL 18
 - 可选：pg_cron，用于数据库内定时任务调度
 - 反向代理：Nginx、Caddy 或同类网关
 
@@ -54,17 +54,17 @@ GRANT ALL PRIVILEGES ON DATABASE pyboard_db TO pyboard_admin;
 
 ### 安装扩展包
 
-Debian / Ubuntu，按实际 PostgreSQL 主版本替换 `15`：
+Debian / Ubuntu，按实际 PostgreSQL 主版本替换 `18`：
 
 ```bash
 sudo apt update
-sudo apt install postgresql-15-cron
+sudo apt install postgresql-18-cron
 ```
 
-RHEL / Rocky Linux / AlmaLinux / CentOS，按实际 PostgreSQL 主版本替换 `15`：
+RHEL / Rocky Linux / AlmaLinux / CentOS，按实际 PostgreSQL 主版本替换 `18`：
 
 ```bash
-sudo dnf install pg_cron_15
+sudo dnf install pg_cron_18
 ```
 
 如果使用托管 PostgreSQL，通常需要在控制台的参数组或扩展管理页面启用 pg_cron。不同厂商限制不同，核心要求是数据库实例已经加载 `pg_cron`，并且目标数据库可以执行 `CREATE EXTENSION pg_cron`。

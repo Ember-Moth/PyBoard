@@ -1,34 +1,44 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# V2Board 用户端前端
 
-## Getting Started
+## 本地开发
 
-First, run the development server:
+项目使用 `pnpm`。如果 Node.js 由 `fnm` 管理，先加载当前 shell 的 Node 环境：
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+```powershell
+fnm env --use-on-cd | Out-String | Invoke-Expression
+pnpm install
+pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 运行时配置
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+前端会在浏览器运行时读取 `public/config.json`，用于配置后端 API 地址和落地页页脚内容。这个文件会以 `/config.json` 暴露，部署后修改该文件即可调整配置，不需要重新构建前端。
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```json
+{
+  "apiBaseUrl": "https://api.example.com",
+  "footer": {
+    "description": "自定义页脚描述",
+    "copyright": "Copyright © 2026 Example. All rights reserved.",
+    "seoKeywords": ["VPN", "代理节点", "订阅节点", "套餐流量"],
+    "links": [
+      {
+        "label": "官方网站",
+        "href": "https://example.com"
+      }
+    ],
+    "contacts": [
+      {
+        "label": "Telegram",
+        "href": "https://t.me/example"
+      },
+      {
+        "label": "邮箱",
+        "text": "support@example.com"
+      }
+    ]
+  }
+}
+```
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+`apiBaseUrl` 留空时，请求会使用当前前端域名作为同源 API 地址。
