@@ -6,7 +6,7 @@
 
 - Python >= 3.14
 - uv
-- PostgreSQL 14+，推荐 15+
+- PostgreSQL 18
 - 可选：pg_cron，用于数据库内定时入队
 
 项目已经放弃 SQLite、MySQL 和 Redis。运行期缓存、队列、定时任务和业务数据都围绕 PostgreSQL 设计。
@@ -16,14 +16,6 @@
 ```bash
 uv sync
 cp .env.example .env
-uv run uvicorn main:app --reload
-```
-
-Windows PowerShell:
-
-```powershell
-uv sync
-Copy-Item .env.example .env
 uv run uvicorn main:app --reload
 ```
 
@@ -291,17 +283,6 @@ PG_PORT=5432
 PG_USER=pyboard_admin
 PG_PASSWORD=your-password
 PG_DATABASE=pyboard_db
-```
-
-Windows PowerShell:
-
-```powershell
-$env:PG_HOST='127.0.0.1'
-$env:PG_PORT='5432'
-$env:PG_USER='pyboard_admin'
-$env:PG_PASSWORD='your-password'
-$env:PG_DATABASE='pyboard_db'
-uv run pytest
 ```
 
 ## 提交前检查

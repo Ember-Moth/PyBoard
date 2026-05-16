@@ -1,15 +1,5 @@
 # V2Board 用户端前端
 
-## 本地开发
-
-项目使用 `pnpm`。如果 Node.js 由 `fnm` 管理，先加载当前 shell 的 Node 环境：
-
-```powershell
-fnm env --use-on-cd | Out-String | Invoke-Expression
-pnpm install
-pnpm run dev
-```
-
 ## 运行时配置
 
 前端会在浏览器运行时读取 `public/config.json`，用于配置后端 API 地址和落地页页脚内容。这个文件会以 `/config.json` 暴露，部署后修改该文件即可调整配置，不需要重新构建前端。

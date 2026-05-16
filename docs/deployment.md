@@ -186,12 +186,6 @@ $$;
 cp .env.example .env
 ```
 
-Windows PowerShell:
-
-```powershell
-Copy-Item .env.example .env
-```
-
 最小配置：
 
 ```env
@@ -324,15 +318,6 @@ NEXT_OUTPUT=export pnpm run build
 
 ```text
 /opt/PyBoard/frontend/out
-```
-
-Windows PowerShell 构建命令：
-
-```powershell
-cd frontend
-fnm env --use-on-cd | Out-String | Invoke-Expression
-$env:NEXT_OUTPUT = "export"
-pnpm run build
 ```
 
 ### 前端运行时配置
