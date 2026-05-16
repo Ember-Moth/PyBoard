@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, Stack, Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Alert, Box, Button, Checkbox, FormControlLabel, FormGroup, Stack, Typography } from "@mui/material";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import CustomTextField from "@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField";
 import TurnstileWidget from "@/components/auth/TurnstileWidget";
@@ -13,8 +14,8 @@ import type { GuestConfig } from "@/types/api";
 
 interface LoginType {
   title?: string;
-  subtitle?: React.ReactNode;
-  subtext?: React.ReactNode;
+  subtitle?: ReactNode;
+  subtext?: ReactNode;
 }
 
 const AuthLogin = ({ title, subtitle, subtext }: LoginType) => {
@@ -53,7 +54,7 @@ const AuthLogin = ({ title, subtitle, subtext }: LoginType) => {
     setTurnstileToken(token);
   }, []);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setLoading(true);
@@ -98,7 +99,7 @@ const AuthLogin = ({ title, subtitle, subtext }: LoginType) => {
             <CustomTextField
               id="email"
               value={email}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
               variant="outlined"
               fullWidth
               required
@@ -112,7 +113,7 @@ const AuthLogin = ({ title, subtitle, subtext }: LoginType) => {
               id="password"
               type="password"
               value={password}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
               variant="outlined"
               fullWidth
               required

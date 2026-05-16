@@ -1,12 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
-import Link from "next/link";
 import { Alert, Box, Button, Card, Grid, Stack, Typography } from "@mui/material";
+import Link from "next/link";
+import { useCallback, useEffect, useState } from "react";
 
 import PageContainer from "@/app/(DashboardLayout)/components/container/PageContainer";
-import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import CustomTextField from "@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField";
+import Logo from "@/app/(DashboardLayout)/layout/shared/logo/Logo";
 import TurnstileWidget from "@/components/auth/TurnstileWidget";
 import { forgetPassword, getGuestConfig, sendEmailVerify } from "@/services/auth.service";
 import type { GuestConfig } from "@/types/api";

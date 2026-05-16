@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 import { Avatar, Box, Button, IconButton, ListItemIcon, ListItemText, Menu, MenuItem } from "@mui/material";
 import { IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 import { clearAuthToken } from "@/lib/auth";
 

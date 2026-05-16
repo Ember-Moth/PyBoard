@@ -1,4 +1,5 @@
-import { useMediaQuery, Box, Drawer } from "@mui/material";
+import { Box, Drawer, useMediaQuery } from "@mui/material";
+import type { Theme } from "@mui/material/styles";
 import SidebarItems from "./SidebarItems";
 
 interface ItemType {
@@ -8,7 +9,7 @@ interface ItemType {
 }
 
 const MSidebar = ({ isMobileSidebarOpen, onSidebarClose, isSidebarOpen }: ItemType) => {
-  const lgUp = useMediaQuery((theme: any) => theme.breakpoints.up("lg"));
+  const lgUp = useMediaQuery((theme: Theme) => theme.breakpoints.up("lg"));
 
   const sidebarWidth = "270px";
 

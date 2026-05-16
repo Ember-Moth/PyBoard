@@ -1,8 +1,8 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Box, CircularProgress } from "@mui/material";
+import { useRouter } from "next/navigation";
+import { type ReactNode, useEffect, useState } from "react";
 
 import { clearAuthToken, getAuthToken } from "@/lib/auth";
 import { getCurrentUser } from "@/services/auth.service";

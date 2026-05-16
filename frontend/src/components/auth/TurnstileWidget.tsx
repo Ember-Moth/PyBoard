@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { Alert, Box } from "@mui/material";
+import { useEffect, useRef } from "react";
 
 type TurnstileInstance = {
   render: (element: HTMLElement, options: Record<string, unknown>) => string;

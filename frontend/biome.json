@@ -13,7 +13,11 @@
     "enabled": false
   },
   "assist": {
-    "enabled": false
+    "actions": {
+      "source": {
+        "organizeImports": "on"
+      }
+    }
   },
   "javascript": {
     "formatter": {

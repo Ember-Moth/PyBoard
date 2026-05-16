@@ -1,14 +1,26 @@
-import React from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { Box } from "@mui/material";
 import { IconPoint } from "@tabler/icons-react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import type { ComponentType } from "react";
 import { Logo, Menu, MenuItem, Sidebar as MUI_Sidebar, Submenu } from "react-mui-sidebar";
 
 import Menuitems from "./MenuItems";
 
-const renderMenuItems = (items: any[], pathDirect: string) => {
-  return items.map((item: any) => {
+type SidebarIcon = ComponentType<{ stroke?: number; size?: number | string }>;
+
+type SidebarMenuItem = {
+  navlabel?: boolean;
+  subheader?: string;
+  id?: string;
+  title?: string;
+  icon?: SidebarIcon;
+  href?: string;
+  children?: SidebarMenuItem[];
+};
+
+const renderMenuItems = (items: SidebarMenuItem[], pathDirect: string) => {
+  return items.map((item) => {
     const Icon = item.icon ? item.icon : IconPoint;
     const itemIcon = <Icon stroke={1.5} size="1.3rem" />;
 
@@ -30,7 +42,7 @@ const renderMenuItems = (items: any[], pathDirect: string) => {
           isSelected={pathDirect === item?.href}
           borderRadius="8px"
           icon={itemIcon}
-          link={item.href}
+          link={item.href || "#"}
           component={Link}
         >
           {item.title}

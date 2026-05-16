@@ -1,11 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
 import { Box, Container, styled } from "@mui/material";
-
-import AuthGuard from "@/components/auth/AuthGuard";
+import type { ReactNode } from "react";
+import { useState } from "react";
 import Header from "@/app/(DashboardLayout)/layout/header/Header";
 import Sidebar from "@/app/(DashboardLayout)/layout/sidebar/Sidebar";
+import AuthGuard from "@/components/auth/AuthGuard";
 
 const MainWrapper = styled("div")(() => ({
   display: "flex",
@@ -22,7 +22,7 @@ const PageWrapper = styled("div")(() => ({
   backgroundColor: "transparent",
 }));
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [isSidebarOpen] = useState(true);
   const [isMobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 

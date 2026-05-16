@@ -1,11 +1,11 @@
-import React from "react";
 import { AppBar, Badge, Box, IconButton, Stack, styled, Toolbar, Typography } from "@mui/material";
 import { IconBellRinging, IconMenu } from "@tabler/icons-react";
+import type { MouseEvent } from "react";
 
 import Profile from "./Profile";
 
 interface ItemType {
-  toggleMobileSidebar: (event: React.MouseEvent<HTMLElement>) => void;
+  toggleMobileSidebar: (event: MouseEvent<HTMLElement>) => void;
 }
 
 const AppBarStyled = styled(AppBar)(({ theme }) => ({

@@ -1,5 +1,5 @@
+import { Stack, styled, Typography } from "@mui/material";
 import Link from "next/link";
-import { Stack, Typography, styled } from "@mui/material";
 
 const LinkStyled = styled(Link)(() => ({
   height: "70px",

@@ -1,16 +1,16 @@
-import React from "react";
-import { Card, CardContent, Typography, Stack, Box } from "@mui/material";
+import { Box, Card, CardContent, Stack, Typography } from "@mui/material";
+import type { ReactNode } from "react";
 
 type Props = {
   title?: string;
   subtitle?: string;
-  action?: React.ReactNode | any;
-  footer?: React.ReactNode;
-  cardheading?: string | React.ReactNode;
-  headtitle?: string | React.ReactNode;
-  headsubtitle?: string | React.ReactNode;
-  children?: React.ReactNode;
-  middlecontent?: string | React.ReactNode;
+  action?: ReactNode;
+  footer?: ReactNode;
+  cardheading?: string | ReactNode;
+  headtitle?: string | ReactNode;
+  headsubtitle?: string | ReactNode;
+  children?: ReactNode;
+  middlecontent?: string | ReactNode;
 };
 
 const DashboardCard = ({

@@ -1,12 +1,14 @@
 declare module "react-mui-sidebar" {
-  import { ComponentType } from "react";
+  import type { ComponentType } from "react";
+
+  type SidebarComponentProps = Record<string, unknown>;
 
   // Declare the component or types provided by the module here
-  const Sidebar: ComponentType<any>;
-  const Logo: ComponentType<any>;
-  const Menu: ComponentType<any>;
-  const MenuItem: ComponentType<any>;
-  const Submenu: ComponentType<any>;
+  const Sidebar: ComponentType<SidebarComponentProps>;
+  const Logo: ComponentType<SidebarComponentProps>;
+  const Menu: ComponentType<SidebarComponentProps>;
+  const MenuItem: ComponentType<SidebarComponentProps>;
+  const Submenu: ComponentType<SidebarComponentProps>;
 
-  export { Sidebar, Logo, Menu, MenuItem, Submenu };
+  export { Logo, Menu, MenuItem, Sidebar, Submenu };
 }

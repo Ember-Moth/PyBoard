@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Alert, Box, Button, Stack, Typography } from "@mui/material";
+import { useRouter } from "next/navigation";
+import type { ChangeEvent, FormEvent, ReactNode } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import CustomTextField from "@/app/(DashboardLayout)/components/forms/theme-elements/CustomTextField";
 import TurnstileWidget from "@/components/auth/TurnstileWidget";
@@ -12,8 +13,8 @@ import type { GuestConfig } from "@/types/api";
 
 interface RegisterType {
   title?: string;
-  subtitle?: React.ReactNode;
-  subtext?: React.ReactNode;
+  subtitle?: ReactNode;
+  subtext?: ReactNode;
 }
 
 const AuthRegister = ({ title, subtitle, subtext }: RegisterType) => {
@@ -63,7 +64,7 @@ const AuthRegister = ({ title, subtitle, subtext }: RegisterType) => {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
     setMessage("");
@@ -118,7 +119,7 @@ const AuthRegister = ({ title, subtitle, subtext }: RegisterType) => {
           <CustomTextField
             id="email"
             value={email}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setEmail(event.target.value)}
             variant="outlined"
             fullWidth
             required
@@ -131,7 +132,7 @@ const AuthRegister = ({ title, subtitle, subtext }: RegisterType) => {
             id="password"
             type="password"
             value={password}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => setPassword(event.target.value)}
             variant="outlined"
             fullWidth
             required
@@ -152,7 +153,7 @@ const AuthRegister = ({ title, subtitle, subtext }: RegisterType) => {
               <CustomTextField
                 id="invite_code"
                 value={inviteCode}
-                onChange={(event: React.ChangeEvent<HTMLInputElement>) => setInviteCode(event.target.value)}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => setInviteCode(event.target.value)}
                 variant="outlined"
                 fullWidth
                 required
@@ -176,7 +177,7 @@ const AuthRegister = ({ title, subtitle, subtext }: RegisterType) => {
                 <CustomTextField
                   id="email_code"
                   value={emailCode}
-                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => setEmailCode(event.target.value)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => setEmailCode(event.target.value)}
                   variant="outlined"
                   fullWidth
                   required

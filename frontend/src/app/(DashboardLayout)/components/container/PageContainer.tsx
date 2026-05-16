@@ -1,9 +1,9 @@
 // import { Helmet } from 'react-helmet';
-import react from "react";
+import type { ReactNode } from "react";
 
 type Props = {
   description?: string;
-  children: React.ReactNode;
+  children: ReactNode;
   title?: string;
 };
 
